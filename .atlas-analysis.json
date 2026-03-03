@@ -1,0 +1,131 @@
+{
+  "projectType": "saas",
+  "projectName": "SlasshyWispr",
+  "projectDescription": "Desktop voice dictation and AI assistant with online, offline, and hybrid model routing",
+  "theme": "palm",
+  "primaryColor": "#6366F1",
+  "lightColor": "#818CF8",
+  "darkColor": "#4338CA",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/voice-dictation",
+              "features/assistant-mode",
+              "features/runtime-modes",
+              "features/clipboard-workflow"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/models",
+              "configuration/hotkeys",
+              "configuration/tts-setup",
+              "configuration/advanced-settings"
+            ]
+          },
+          {
+            "group": "Local Models",
+            "pages": [
+              "local/stt-models",
+              "local/ollama-setup",
+              "local/hardware-requirements"
+            ]
+          },
+          {
+            "group": "Productivity Tools",
+            "pages": [
+              "tools/dictionary",
+              "tools/snippets",
+              "tools/notes"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/hybrid-mode",
+              "guides/wake-word",
+              "guides/context-awareness",
+              "guides/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Architecture",
+            "pages": [
+              "api/overview",
+              "api/architecture"
+            ]
+          },
+          {
+            "group": "Commands",
+            "pages": [
+              "api/commands/assistant",
+              "api/commands/models",
+              "api/commands/settings"
+            ]
+          },
+          {
+            "group": "Types",
+            "pages": [
+              "api/types/runtime",
+              "api/types/responses"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Fast voice dictation with customizable hotkeys",
+    "Wake phrase assistant mode (e.g., 'Hey Jarvis')",
+    "Online, Offline, and Hybrid runtime routing",
+    "Local STT support with Parakeet and Whisper models",
+    "Local AI integration with Ollama",
+    "Built-in TTS playback (Piper and Coqui engines)",
+    "Clipboard-friendly dictation workflow",
+    "Dictionary, snippets, and notes management",
+    "Real-time pipeline status with latency metrics",
+    "Context-aware selection rewriting"
+  ],
+  "publicApiSurface": [
+    "assistant_pipeline",
+    "check_for_app_update",
+    "install_app_update",
+    "get_assistant_info",
+    "setup_runtime",
+    "install_piper_voice",
+    "validate_piper_setup",
+    "get_coqui_status",
+    "setup_coqui",
+    "validate_coqui_setup",
+    "get_ollama_status",
+    "pull_ollama_model",
+    "get_provider_models",
+    "download_local_stt_model",
+    "warmup_local_stt_daemon",
+    "deactivate_local_stt_daemon",
+    "get_local_stt_hardware_advice",
+    "delete_local_stt_model",
+    "tts_speak_audio",
+    "coqui_clone_voice",
+    "coqui_preview_voice"
+  ]
+}
