@@ -1,0 +1,207 @@
+---
+title: Text Snippets
+description: Create reusable text expansions triggered during dictation
+---
+
+Text snippets allow you to create shortcuts that expand into longer text during dictation. Simply speak a trigger phrase, and SlasshyWispr will automatically replace it with the full expansion text.
+
+## What are Snippets
+
+Snippets are text expansion shortcuts that save time when dictating frequently used phrases, templates, signatures, or boilerplate content. They work similarly to traditional text expanders but are activated through voice commands during dictation.
+
+<Info>
+Snippets are processed during dictation and expand automatically when the trigger phrase is recognized in your transcribed text.
+</Info>
+
+## SnippetEntry Structure
+
+Each snippet contains the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Unique identifier for the snippet |
+| `trigger` | string | The phrase that activates the expansion |
+| `expansion` | string | The full text that replaces the trigger |
+| `scope` | "personal" \| "shared" | Whether the snippet is private or team-wide |
+| `createdAt` | number | Unix timestamp of when the snippet was created |
+
+<Note>
+Trigger phrases should be unique and easy to pronounce. Avoid common words that might appear naturally in your dictation.
+</Note>
+
+## Creating Snippets
+
+<Steps>
+  <Step title="Navigate to Snippets">
+    Open the Snippets section from the main navigation
+  </Step>
+  
+  <Step title="Add New Snippet">
+    Click the "Add Snippet" button to create a new entry
+  </Step>
+  
+  <Step title="Define Trigger">
+    Enter a short, distinctive phrase that will activate the snippet. Examples:
+    - `"email sig"`
+    - `"meeting template"`
+    - `"bug report"`
+  </Step>
+  
+  <Step title="Write Expansion">
+    Enter the full text that should replace the trigger. This can be:
+    - Multiple paragraphs
+    - Formatted templates
+    - Email signatures
+    - Code boilerplate
+    - Any frequently used text
+  </Step>
+  
+  <Step title="Set Scope">
+    Choose the appropriate scope:
+    - **Personal**: Only you can use this snippet
+    - **Shared**: All team members can use this snippet
+  </Step>
+  
+  <Step title="Save">
+    Click "Save" to activate your snippet
+  </Step>
+</Steps>
+
+## Using Snippets in Dictation
+
+Once created, snippets work automatically during dictation:
+
+1. Start dictating as usual
+2. Speak the trigger phrase naturally in your sentence
+3. SlasshyWispr recognizes the trigger and expands it to the full text
+4. Continue dictating after the expansion
+
+### Example Workflow
+
+**Snippet Setup:**
+```plaintext
+Trigger: "email sig"
+Expansion: "Best regards,
+John Smith
+Senior Developer
+john@company.com"
+```
+
+**During Dictation:**
+You say: _"Thanks for reaching out. email sig"_
+
+SlasshyWispr types:
+```
+Thanks for reaching out. Best regards,
+John Smith
+Senior Developer
+john@company.com
+```
+
+## Team vs Personal Snippets
+
+<CardGroup cols={2}>
+  <Card title="Personal Snippets" icon="user">
+    Stored locally and only available to you. Perfect for personal templates, your email signature, or individual workflows.
+  </Card>
+  
+  <Card title="Shared Snippets" icon="users">
+    Synchronized across your team and available to all members. Ideal for company templates, standard responses, or team protocols.
+  </Card>
+</CardGroup>
+
+### Recommended Personal Snippets
+
+- Personal email signatures
+- Individual meeting notes templates
+- Your own code snippets
+- Personal greetings and closings
+- Client-specific responses
+
+### Recommended Shared Snippets
+
+- Company email templates
+- Support response templates
+- Bug report formats
+- Meeting agenda templates
+- Standard legal disclaimers
+- Product descriptions
+
+## Best Practices
+
+<Note>
+**Choose Clear Triggers**: Use distinctive phrases that won't accidentally appear in normal conversation. Avoid single common words.
+</Note>
+
+<Note>
+**Test Your Snippets**: After creating a snippet, test it in a dictation session to ensure the trigger is recognized correctly.
+</Note>
+
+<Note>
+**Keep Expansions Focused**: While snippets can be long, consider breaking very large templates into multiple smaller snippets for flexibility.
+</Note>
+
+## Common Use Cases
+
+### Email Templates
+
+```plaintext
+Trigger: "schedule meeting"
+Expansion: "I'd like to schedule a meeting to discuss this further. 
+Please let me know your availability this week."
+```
+
+### Code Boilerplate
+
+```plaintext
+Trigger: "react component"
+Expansion: "import React from 'react';
+
+export const Component = () => {
+  return (
+    <div>
+      
+    </div>
+  );
+};"
+```
+
+### Support Responses
+
+```plaintext
+Trigger: "support greeting"
+Expansion: "Thank you for contacting support. I'm happy to help you with this issue. 
+Could you please provide more details about what you're experiencing?"
+```
+
+### Meeting Notes
+
+```plaintext
+Trigger: "meeting notes"
+Expansion: "Meeting Notes
+Date: 
+Attendees: 
+Agenda:
+1. 
+2. 
+3. 
+
+Action Items:
+- "
+```
+
+## Managing Snippets
+
+- **Edit**: Click any snippet to modify its trigger, expansion, or scope
+- **Delete**: Remove snippets you no longer need
+- **Search**: Quickly find snippets using the search function
+- **Filter**: View personal, shared, or all snippets
+- **Sort**: Organize by creation date or alphabetically
+
+## Storage
+
+Snippets are stored using the key `slasshy-wispr-snippets-v1` and persist across application sessions. Shared snippets require team synchronization to be configured in your settings.
+
+<Info>
+Snippets are processed after dictionary terms, so you can combine both features for maximum customization.
+</Info>

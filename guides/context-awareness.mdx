@@ -1,0 +1,425 @@
+---
+title: Context Awareness Guide
+description: Learn how to use SlasshyWispr's context awareness feature to rewrite selected text and provide context-aware responses.
+---
+
+## Context Awareness Feature
+
+Context awareness allows SlasshyWispr to understand and act on text you've selected in other applications. This powerful feature enables:
+
+- **Selection rewriting**: Transform selected text using voice commands
+- **Context-aware responses**: Ask questions about selected content
+- **Seamless editing**: Improve, rephrase, or modify text without manual copying
+- **Smart assistance**: Get help based on what you're currently working on
+
+<Note>
+  Context awareness is controlled by the `contextAwareness` setting in your configuration. When enabled, SlasshyWispr monitors text selections and offers intelligent interaction options.
+</Note>
+
+## How Context Awareness Works
+
+When you select text in any application and activate SlasshyWispr, the app:
+
+<Steps>
+  <Step title="Detects Selection">
+    Automatically detects that you have text selected when you trigger voice input.
+  </Step>
+  
+  <Step title="Captures Context">
+    Stores the selected text as context for your voice command.
+  </Step>
+  
+  <Step title="Interprets Intent">
+    Determines whether you want to:
+    - **Rewrite** the selected text
+    - **Answer** a question about the selection
+    - **Use as context** for your command
+  </Step>
+  
+  <Step title="Processes with Context">
+    Sends both your voice command and the selected text to the AI for context-aware processing.
+  </Step>
+  
+  <Step title="Returns Result">
+    Provides the response, which may replace your selection or be spoken back to you.
+  </Step>
+</Steps>
+
+## Selection Context Usage
+
+The pipeline response includes several context-related fields:
+
+```typescript
+interface AssistantPipelineResponse {
+  selectionRewrite: boolean;           // Is this a rewrite operation?
+  selectionPending: boolean;           // Is selection context waiting?
+  selectionContextCleared: boolean;    // Was context cleared?
+  selectionContextUsed: boolean;       // Was context used in this request?
+  // ... other fields
+}
+```
+
+These flags help SlasshyWispr track and manage selection context throughout your workflow.
+
+### Context States
+
+<Accordion title="Selection Pending">
+  **When**: You've selected text but haven't yet given a voice command.
+  
+  **Indicator**: `selectionPending: true`
+  
+  **Action**: The selection is captured and waiting for your voice instruction.
+</Accordion>
+
+<Accordion title="Selection Used">
+  **When**: Your voice command has been processed with the selection as context.
+  
+  **Indicator**: `selectionContextUsed: true`
+  
+  **Action**: The AI used your selected text to inform its response.
+</Accordion>
+
+<Accordion title="Selection Cleared">
+  **When**: The context has been reset after use or cancellation.
+  
+  **Indicator**: `selectionContextCleared: true`
+  
+  **Action**: Previous selection context is no longer active.
+</Accordion>
+
+## Selection Rewriting Workflow
+
+Selection rewriting is the most powerful context awareness feature. Here's how it works:
+
+<Steps>
+  <Step title="Select Text">
+    In any application (Word, browser, code editor, etc.), highlight the text you want to modify.
+    
+    **Example**: Select "This sentence needs improvement" in your document.
+  </Step>
+  
+  <Step title="Activate SlasshyWispr">
+    Press your command hotkey (default: `Ctrl+Shift+Space`) or use wake word ("Hey Lily").
+  </Step>
+  
+  <Step title="Give Rewrite Command">
+    Speak your rewriting instruction:
+    - "Make this more professional"
+    - "Simplify this"
+    - "Fix grammar"
+    - "Expand this with more details"
+    - "Translate to Spanish"
+  </Step>
+  
+  <Step title="Receive Rewritten Text">
+    SlasshyWispr processes your command with the selected text as context and returns the rewritten version.
+    
+    **Pipeline indicator**: `selectionRewrite: true`
+  </Step>
+  
+  <Step title="Replace or Review">
+    Depending on your settings:
+    - Text automatically replaces your selection
+    - Result is copied to clipboard
+    - Result is spoken aloud via TTS
+  </Step>
+</Steps>
+
+### Rewrite Mode Indicators
+
+When `selectionRewrite: true` in the pipeline response:
+- The operation is specifically a text transformation
+- The selected text was used as input
+- The response is intended to replace the selection
+
+<Tip>
+  The AI can intelligently distinguish between rewrite requests and questions about your selection based on your voice command phrasing.
+</Tip>
+
+## Recent Selection Context
+
+SlasshyWispr maintains recent selection context even after you've moved on, enabling multi-turn interactions:
+
+### Context Retention
+
+1. **First Interaction**: Select text → Give command → Context stored
+2. **Follow-up**: Without selecting new text → Give related command → Previous context available
+3. **Context Cleared**: New selection → Manual clear → Starting fresh
+
+This allows workflows like:
+
+<Accordion title="Iterative Refinement">
+  **Workflow**:
+  1. Select paragraph
+  2. "Make this more concise"
+  3. Review result
+  4. "Make it even shorter"
+  5. "Actually, add technical details"
+  
+  Each command refines based on the original selection context.
+</Accordion>
+
+<Accordion title="Multi-Question Analysis">
+  **Workflow**:
+  1. Select code snippet
+  2. "Explain what this does"
+  3. Listen to explanation
+  4. "Are there any bugs?"
+  5. "How can I optimize this?"
+  
+  All questions reference the same selected code without re-selecting.
+</Accordion>
+
+## Configuration
+
+### Enable Context Awareness
+
+**Setting**: `contextAwareness` (boolean)
+
+**Default**: Check your settings
+
+<Steps>
+  <Step title="Open General Settings">
+    Navigate to **Settings > General** in SlasshyWispr.
+  </Step>
+  
+  <Step title="Enable Context Awareness">
+    Toggle **Context Awareness** to enable the feature.
+  </Step>
+  
+  <Step title="Configure Related Settings">
+    Consider these complementary settings:
+    - **Auto Paste Dictation**: Automatically paste results
+    - **Copy to Clipboard**: Save results to clipboard
+    - **Command Mode**: Required for assistant features
+  </Step>
+</Steps>
+
+### Related Settings
+
+```typescript
+{
+  "contextAwareness": true,        // Enable selection context
+  "commandMode": true,             // Enable assistant mode
+  "autoPasteDictation": true,      // Auto-paste rewrites
+  "copyToClipboard": true          // Copy results to clipboard
+}
+```
+
+<Warning>
+  Context awareness requires **command mode** to be enabled. Ensure `commandMode: true` in your settings.
+</Warning>
+
+## Use Cases and Examples
+
+### Use Case 1: Writing Enhancement
+
+**Scenario**: Improving email drafts
+
+<Steps>
+  <Step title="Draft Email">
+    Write a quick email draft with rough language.
+  </Step>
+  
+  <Step title="Select Paragraph">
+    Highlight the paragraph you want to improve.
+  </Step>
+  
+  <Step title="Voice Command">
+    Say: "Make this more professional and formal"
+  </Step>
+  
+  <Step title="Review & Apply">
+    Review the rewritten text and paste or insert it.
+  </Step>
+</Steps>
+
+**Example**:
+- **Original**: "Hey, wanted to check in about that thing we talked about. Let me know."
+- **Command**: "Make this more professional"
+- **Result**: "I wanted to follow up on our previous discussion regarding the project timeline. Please let me know your thoughts at your earliest convenience."
+
+### Use Case 2: Code Documentation
+
+**Scenario**: Adding comments to code
+
+<Steps>
+  <Step title="Select Code">
+    Highlight a function or code block.
+  </Step>
+  
+  <Step title="Request Documentation">
+    Say: "Write documentation for this function"
+  </Step>
+  
+  <Step title="Insert Comments">
+    Receive properly formatted documentation comments.
+  </Step>
+</Steps>
+
+**Example**:
+- **Selected Code**: `function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }`
+- **Command**: "Add JSDoc comments"
+- **Result**: Detailed JSDoc comment block explaining parameters, return value, and usage
+
+### Use Case 3: Translation
+
+**Scenario**: Translating selected text
+
+<Steps>
+  <Step title="Select Text">
+    Highlight text in any language.
+  </Step>
+  
+  <Step title="Translation Command">
+    Say: "Translate this to [language]"
+  </Step>
+  
+  <Step title="Receive Translation">
+    Get accurate translation based on context.
+  </Step>
+</Steps>
+
+**Example**:
+- **Selected**: "The quick brown fox jumps over the lazy dog"
+- **Command**: "Translate to Spanish"
+- **Result**: "El rápido zorro marrón salta sobre el perro perezoso"
+
+### Use Case 4: Content Summarization
+
+**Scenario**: Summarizing long passages
+
+<Steps>
+  <Step title="Select Long Text">
+    Highlight a lengthy paragraph or article section.
+  </Step>
+  
+  <Step title="Summarize Command">
+    Say: "Summarize this in one sentence" or "Give me the key points"
+  </Step>
+  
+  <Step title="Review Summary">
+    Receive concise summary of the selected content.
+  </Step>
+</Steps>
+
+**Example**:
+- **Selected**: [3 paragraphs of technical documentation]
+- **Command**: "Summarize this in bullet points"
+- **Result**: 3-5 bullet points capturing main ideas
+
+### Use Case 5: Grammar and Style Fixes
+
+**Scenario**: Quick editing
+
+**Commands that work well**:
+- "Fix grammar"
+- "Fix spelling"
+- "Make this more concise"
+- "Expand this with more details"
+- "Simplify this for a general audience"
+- "Use active voice"
+
+<Tip>
+  Be specific in your voice commands. Instead of "fix this", say "fix grammar and improve clarity" for better results.
+</Tip>
+
+### Use Case 6: Q&A About Selection
+
+**Scenario**: Understanding complex content
+
+**Answer mode** (vs rewrite mode):
+- "What does this mean?"
+- "Explain this in simple terms"
+- "What is the main argument here?"
+- "Are there any issues with this code?"
+
+SlasshyWispr detects these as **questions** rather than rewrite requests:
+- `selectionRewrite: false`
+- Response is spoken via TTS rather than replacing selection
+- Context is used to inform the answer
+
+## Best Practices
+
+<Accordion title="Clear Selection Boundaries">
+  Select complete thoughts, sentences, or code blocks. Partial selections may produce unexpected results.
+  
+  **Good**: Full paragraph, complete function
+  
+  **Avoid**: Sentence fragments, partial lines
+</Accordion>
+
+<Accordion title="Specific Commands">
+  Use precise voice commands that clearly state your intent.
+  
+  **Good**: "Rewrite this in active voice", "Translate to French"
+  
+  **Vague**: "Change this", "Make it better"
+</Accordion>
+
+<Accordion title="Verify Before Replacing">
+  Always review AI-generated rewrites before committing them to important documents.
+  
+  Use `copyToClipboard: true` to review before pasting manually.
+</Accordion>
+
+<Accordion title="Context Clearing">
+  If you want to start fresh without previous selection context, make a new selection or wait for automatic context clearing.
+</Accordion>
+
+<Accordion title="Combine with Style Profiles">
+  Set your `styleProfile` setting to influence how rewrites are performed:
+  - `"professional"`: More formal rewrites
+  - `"casual"`: Conversational tone
+  - `"concise"`: Shorter, more direct
+  - `"developer"`: Technical, code-focused
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="Selection Not Detected">
+  **Problem**: SlasshyWispr doesn't recognize your selection.
+  
+  **Solutions**:
+  - Ensure `contextAwareness: true` in settings
+  - Verify the application allows clipboard/selection access
+  - Try selecting again with Ctrl+A or mouse drag
+  - Check that command mode is enabled
+</Accordion>
+
+<Accordion title="Wrong Context Used">
+  **Problem**: AI uses old selection instead of current one.
+  
+  **Solutions**:
+  - Make a fresh selection before activating
+  - Wait a moment after selecting before voice command
+  - Check `selectionContextUsed` flag in response to verify
+</Accordion>
+
+<Accordion title="Rewrite vs Answer Confusion">
+  **Problem**: Asking a question but getting a rewrite, or vice versa.
+  
+  **Solutions**:
+  - Use clear question words ("What", "Why", "How", "Explain")
+  - For rewrites, use action verbs ("Make", "Rewrite", "Change", "Fix")
+  - Be explicit: "Rewrite this to..." or "Tell me what this means"
+</Accordion>
+
+<Note>
+  Context awareness works across most applications but may have limitations in some protected or sandboxed environments. Test in your primary workflow applications.
+</Note>
+
+## Privacy Considerations
+
+<Warning>
+  When context awareness is enabled, selected text is sent to your configured AI model (online or local) for processing.
+  
+  For sensitive content:
+  - Use **local AI mode** to keep processing on-device
+  - Disable context awareness when working with confidential information
+  - Review your `aiRuntimeMode` setting
+</Warning>
+
+<Tip>
+  **Privacy-First Setup**: Use `aiRuntimeMode: "local"` with Ollama to ensure all context-aware processing happens locally without sending data to external APIs.
+</Tip>

@@ -1,0 +1,204 @@
+---
+title: Hybrid Mode Guide
+description: Learn how to configure and use hybrid mode to intelligently route between online and local models in SlasshyWispr.
+---
+
+## What is Hybrid Mode
+
+Hybrid mode allows SlasshyWispr to intelligently route voice processing tasks between online (cloud-based) and local (on-device) models. This gives you the flexibility to balance between performance, privacy, and cost based on your needs.
+
+With hybrid mode, you can configure:
+- **STT (Speech-to-Text)** to use online or local models
+- **AI (Assistant)** to use online or local models
+
+Each component can be set independently, allowing for combinations like:
+- Online STT + Local AI
+- Local STT + Online AI
+- All online or all local
+
+## How Hybrid Routing Works
+
+SlasshyWispr provides three runtime modes for each component:
+
+<Steps>
+  <Step title="Online Mode">
+    Routes requests to cloud-based API providers. Requires API credentials and internet connection. Typically offers the best quality and fastest processing for complex tasks.
+  </Step>
+  
+  <Step title="Local Mode">
+    Routes requests to models running on your device. For STT, this uses downloaded Parakeet or Whisper models. For AI, this uses locally running Ollama models. Works completely offline.
+  </Step>
+  
+  <Step title="Hybrid Configuration">
+    You set the runtime mode independently for STT and AI, creating a hybrid setup that matches your workflow.
+  </Step>
+</Steps>
+
+### Component-Level Configuration
+
+The app tracks separate runtime modes:
+
+- `sttRuntimeMode`: Controls speech-to-text processing (`online` | `local`)
+- `aiRuntimeMode`: Controls AI assistant responses (`online` | `local`)
+- `runtimeMode`: Legacy setting for overall mode preference
+
+## When to Use Hybrid Mode
+
+<Accordion title="Privacy-First Workflows">
+  Use **local STT + local AI** when handling sensitive information. All processing stays on your device with no data sent to external servers.
+  
+  Example: Medical dictation, legal notes, financial planning
+</Accordion>
+
+<Accordion title="Performance-Optimized Setup">
+  Use **online STT + local AI** for fast transcription with privacy-conscious responses.
+  
+  Example: General productivity work where transcription speed matters but you want to keep AI reasoning local
+</Accordion>
+
+<Accordion title="Quality-First Configuration">
+  Use **online STT + online AI** when you need the highest quality results and have reliable internet.
+  
+  Example: Professional content creation, complex research queries
+</Accordion>
+
+<Accordion title="Offline-Ready Setup">
+  Use **local STT + local AI** when working without internet access or with unreliable connectivity.
+  
+  Example: Travel, remote locations, air-gapped environments
+</Accordion>
+
+## Configuration for Hybrid
+
+<Steps>
+  <Step title="Open Settings">
+    Navigate to **Settings > Models** in SlasshyWispr.
+  </Step>
+  
+  <Step title="Configure STT Runtime">
+    Choose your STT runtime mode:
+    - Select **Online** to use cloud-based speech recognition
+    - Select **Offline** to use local Parakeet or Whisper models
+    
+    If you choose **Offline**, you'll need to download a local STT model from the available options:
+    - Parakeet v3 (478 MB) - Recommended
+    - Parakeet v2 (473 MB)
+    - Whisper models (487 MB - 1.6 GB)
+    - Moonshine Base (58.0 MB)
+    - SenseVoice (160 MB)
+  </Step>
+  
+  <Step title="Configure AI Runtime">
+    Choose your AI runtime mode:
+    - Select **Online** to use cloud-based language models
+    - Select **Offline** to use local Ollama models
+    
+    If you choose **Offline**, ensure Ollama is installed and pull the models you want to use.
+  </Step>
+  
+  <Step title="Set Up Credentials (if using Online)">
+    If either component uses online mode:
+    - Enter your **API Base URL**
+    - Add your **API Key**
+    - Specify model names for STT and/or AI
+  </Step>
+  
+  <Step title="Configure Local Models (if using Offline)">
+    If using local STT:
+    - Download your preferred model from the STT model list
+    - Wait for model to load (first load may take time)
+    
+    If using local AI:
+    - Set **Local Ollama Base URL** (default: `http://127.0.0.1:11434`)
+    - Select or pull an Ollama model
+  </Step>
+</Steps>
+
+## Best Practices
+
+<Note>
+  **Start with Online Mode**: If you're new to SlasshyWispr, start with online mode for both components to get the best initial experience, then experiment with local models once you're comfortable.
+</Note>
+
+<Tip>
+  **Hardware Matters**: Local STT models perform best on systems with:
+  - NVIDIA GPU with sufficient VRAM for GPU acceleration
+  - At least 8GB RAM for CPU-based inference
+  - Multi-core processors for faster processing
+  
+  Check **Settings > Offline STT** for hardware-specific model recommendations.
+</Tip>
+
+<Warning>
+  **Network Dependency**: Online modes require active internet. If your connection is unstable, consider using local modes to avoid interruptions during dictation.
+</Warning>
+
+### Optimization Tips
+
+1. **Model Selection**: Choose smaller local models (like Moonshine Base) for speed, larger models (like Whisper Large) for accuracy
+2. **Warmup Models**: Local STT models load faster after first use. Consider warming up your model before important sessions
+3. **API Costs**: Monitor your online API usage and switch to local models for routine tasks to reduce costs
+4. **Latency Monitoring**: Check **Settings > Pipeline** to view real-time STT, AI, and TTS latencies to tune your configuration
+
+## Example Scenarios
+
+### Scenario 1: Developer Workflow
+
+**Configuration**: Local STT + Online AI
+
+**Why**: Fast local transcription for code comments and documentation, with powerful online AI for complex code generation and technical queries.
+
+**Settings**:
+```
+sttRuntimeMode: "local"
+localSttModel: "nvidia/parakeet-tdt-0.6b-v3"
+aiRuntimeMode: "online"
+aiModelName: "gpt-4" (or your preferred model)
+```
+
+### Scenario 2: Privacy-Conscious Professional
+
+**Configuration**: Local STT + Local AI
+
+**Why**: Complete offline operation, no data leaves your device. Perfect for confidential work.
+
+**Settings**:
+```
+sttRuntimeMode: "local"
+localSttModel: "nvidia/parakeet-tdt-0.6b-v3"
+aiRuntimeMode: "local"
+localOllamaModel: "llama3.2"
+localOllamaBaseUrl: "http://127.0.0.1:11434"
+```
+
+### Scenario 3: Content Creator
+
+**Configuration**: Online STT + Online AI
+
+**Why**: Maximum quality for professional content creation with advanced language processing.
+
+**Settings**:
+```
+sttRuntimeMode: "online"
+sttModelName: "whisper-1"
+aiRuntimeMode: "online"
+aiModelName: "gpt-4"
+```
+
+### Scenario 4: Mobile/Offline Worker
+
+**Configuration**: Local STT + Local AI
+
+**Why**: Work anywhere without internet dependency.
+
+**Settings**:
+```
+sttRuntimeMode: "local"
+localSttModel: "UsefulSensors/moonshine-base" (smallest)
+aiRuntimeMode: "local"
+localOllamaModel: "llama3.2:1b" (efficient)
+```
+
+<Tip>
+  Test different configurations to find what works best for your hardware and workflow. You can switch between modes anytime without losing your settings.
+</Tip>

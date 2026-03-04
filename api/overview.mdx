@@ -1,0 +1,161 @@
+---
+title: 'API Overview'
+description: 'Architectural overview of SlasshyWispr desktop application and API system'
+---
+
+## Architecture Overview
+
+SlasshyWispr is a **Tauri-based desktop application** combining a TypeScript/Vite frontend with a Rust backend, providing voice dictation and AI assistant capabilities with support for online, offline, and hybrid model routing.
+
+<CardGroup cols={2}>
+  <Card title="Frontend" icon="code">
+    TypeScript + Vite
+    
+    Modern web UI with Tauri API bindings
+  </Card>
+  <Card title="Backend" icon="gear">
+    Rust
+    
+    High-performance native operations and system integration
+  </Card>
+</CardGroup>
+
+## Core Technologies
+
+### Frontend Stack
+- **Framework**: TypeScript + Vite
+- **UI**: Custom CSS with shadcn-ui patterns
+- **Window Management**: Tauri WebviewWindow API
+- **Global Shortcuts**: `@tauri-apps/plugin-global-shortcut`
+- **IPC**: Tauri invoke API for frontend-backend communication
+
+### Backend Stack
+- **Framework**: Tauri 2.10.0
+- **Language**: Rust (edition 2021)
+- **HTTP Client**: reqwest with rustls-tls
+- **Audio Processing**: hound, transcribe-rs
+- **ML Runtime**: ONNX Runtime (ort 2.0.0-rc.10)
+- **Serialization**: serde + serde_json
+- **Secure Storage**: keyring (credential management)
+
+<Info>
+The application uses Tauri's commands system to expose Rust functions to the TypeScript frontend via asynchronous IPC calls.
+</Info>
+
+## Tauri Commands System
+
+SlasshyWispr exposes backend functionality to the frontend through Tauri commands. These are Rust functions annotated with `#[tauri::command]` that can be invoked from TypeScript:
+
+```typescript
+// Frontend: TypeScript
+import { invoke } from "@tauri-apps/api/core";
+
+// Call Rust backend command
+const response = await invoke<AssistantPipelineResponse>(
+  "assistant_pipeline",
+  { request: pipelineData }
+);
+```
+
+```rust
+// Backend: Rust
+#[tauri::command]
+async fn assistant_pipeline(
+    state: State<'_, AppState>,
+    request: AssistantPipelineRequest,
+) -> Result<AssistantPipelineResponse, String> {
+    // Process voice input through STT -> AI -> TTS pipeline
+}
+```
+
+<Note>
+All Tauri commands are asynchronous and return `Result<T, String>` types, automatically serialized to JSON for the frontend.
+</Note>
+
+## State Management
+
+The backend maintains a global `AppState` structure managed by Tauri's state system:
+
+```rust
+struct AppState {
+    http: Client,                                    // Shared HTTP client
+    pending_selection_rewrite: Mutex<Option<...>>,  // Text rewrite buffer
+    recent_selection_context: Mutex<Option<...>>,   // Context cache
+    last_transcript: Mutex<String>,                  // STT output
+    last_assistant_response: Mutex<String>,          // AI output
+    local_stt_download_status: Mutex<...>,           // Model download state
+    local_stt_runtime_loaded: Mutex<bool>,           // Runtime status
+}
+```
+
+**Key characteristics:**
+- Thread-safe using `Mutex<T>` for concurrent access
+- Shared HTTP client with connection pooling
+- TTL-based cleanup for cached contexts
+- Real-time download progress tracking
+
+## IPC Communication Patterns
+
+### Request-Response Pattern
+Most commands follow a synchronous request-response model:
+
+1. Frontend sends request via `invoke()`
+2. Backend processes in Rust
+3. Response serialized and returned to TypeScript
+
+### Event Emission Pattern
+For real-time updates (e.g., download progress):
+
+1. Backend emits events via `app.emit()`
+2. Frontend listens with event listeners
+3. UI updates reactively
+
+<Info>
+The AppState uses mutex-protected slots with automatic expiration for temporary data like selection contexts (TTL-based cleanup).
+</Info>
+
+## Key Dependencies
+
+### Rust Backend
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `tauri` | 2.10.0 | Desktop framework |
+| `transcribe-rs` | 0.2.5 | Speech-to-text (Parakeet) |
+| `reqwest` | 0.12 | HTTP client |
+| `ort` | 2.0.0-rc.10 | ONNX Runtime bindings |
+| `serde`/`serde_json` | 1.0 | Serialization |
+| `keyring` | 3 | Secure credential storage |
+| `hound` | 3.5 | Audio file I/O |
+| `base64` | 0.22 | Audio encoding |
+
+### TypeScript Frontend
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `@tauri-apps/api` | 2.10.1 | Tauri JavaScript bindings |
+| `@tauri-apps/plugin-global-shortcut` | 2.3.1 | Hotkey registration |
+| `vite` | 7.3.1 | Build tool |
+| `typescript` | 5.9.3 | Type safety |
+
+<Note>
+The application uses `rustls-tls` instead of OpenSSL for TLS, providing a pure-Rust networking stack without external dependencies.
+</Note>
+
+## Security Features
+
+- **Credential Storage**: System keyring integration for API keys
+- **Windows Data Protection**: DPAPI encryption on Windows (`CryptProtectData`/`CryptUnprotectData`)
+- **Secure HTTP**: rustls-tls with certificate validation
+- **No Local API Key Storage**: Credentials stored in OS-level secure storage
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Architecture Details" href="/api/architecture">
+    Deep dive into component structure and pipeline architecture
+  </Card>
+  <Card title="Commands Reference" href="/api/commands/assistant">
+    Complete list of available Tauri commands
+  </Card>
+</CardGroup>

@@ -1,0 +1,181 @@
+---
+title: Hotkey Configuration
+description: Configure push-to-talk and command hotkeys for voice dictation
+---
+
+SlasshyWispr uses keyboard shortcuts to trigger dictation and assistant commands. Customize hotkeys to match your workflow.
+
+## Default Hotkeys
+
+<ParamField path="pushToTalkHotkey" type="string" default="Ctrl+Space">
+  Push-to-talk hotkey for voice dictation
+  
+  Press and hold to record, release to stop. The recorded audio is transcribed and pasted into the active application.
+  
+  <Note>
+    This is the primary hotkey for dictation mode.
+  </Note>
+</ParamField>
+
+<ParamField path="commandHotkey" type="string" default="Ctrl+Shift+Space">
+  Command hotkey for assistant mode
+  
+  Triggers assistant mode with wake word detection. Speak your command and get an AI-generated response with TTS playback.
+</ParamField>
+
+## HotkeySpec Interface
+
+Hotkeys are internally represented using the `HotkeySpec` structure:
+
+```typescript
+interface HotkeySpec {
+  ctrl: boolean;   // Ctrl key modifier
+  shift: boolean;  // Shift key modifier
+  alt: boolean;    // Alt key modifier
+  meta: boolean;   // Windows/Command key modifier
+  key: string;     // Primary key (e.g., "Space", "A", "F1")
+  label: string;   // Human-readable label (e.g., "Ctrl+Space")
+}
+```
+
+## Customizing Hotkeys
+
+<Tabs>
+  <Tab title="Via Settings UI">
+    1. Open **Settings > General**
+    2. Click on the hotkey field you want to change
+    3. Press your desired key combination
+    4. The hotkey will update automatically
+    5. Test the new hotkey to ensure it works
+    
+    <Note>
+      The UI validates hotkeys in real-time and warns about conflicts.
+    </Note>
+  </Tab>
+  
+  <Tab title="Via Configuration File">
+    Hotkeys are stored as strings in the settings file:
+    
+    ```json
+    {
+      "pushToTalkHotkey": "Ctrl+Space",
+      "commandHotkey": "Ctrl+Shift+Space"
+    }
+    ```
+    
+    You can manually edit these values using the format:
+    - Single modifier: `Ctrl+A`, `Alt+F`, `Shift+Enter`
+    - Multiple modifiers: `Ctrl+Shift+Space`, `Ctrl+Alt+D`
+    - Function keys: `F1`, `F12`, `Ctrl+F5`
+  </Tab>
+</Tabs>
+
+## Supported Key Combinations
+
+### Modifiers
+
+- **Ctrl** - Control key (Windows/Linux) or Command key (macOS)
+- **Shift** - Shift key
+- **Alt** - Alt key (Windows/Linux) or Option key (macOS)
+- **Meta** - Windows key (Windows) or Command key (macOS)
+
+### Primary Keys
+
+<Accordion title="Letter Keys">
+  A-Z (case-insensitive)
+  
+  Examples: `Ctrl+A`, `Shift+B`, `Alt+Z`
+</Accordion>
+
+<Accordion title="Number Keys">
+  0-9 (top row and numpad)
+  
+  Examples: `Ctrl+1`, `Alt+5`
+</Accordion>
+
+<Accordion title="Function Keys">
+  F1-F24
+  
+  Examples: `F1`, `Ctrl+F5`, `Shift+F12`
+</Accordion>
+
+<Accordion title="Special Keys">
+  - `Space`
+  - `Enter`
+  - `Tab`
+  - `Escape`
+  - `Backspace`
+  - `Delete`
+  - Arrow keys: `Up`, `Down`, `Left`, `Right`
+  - And more...
+</Accordion>
+
+## Best Practices
+
+### Avoid Conflicts
+
+<Note>
+  Check that your hotkeys don't conflict with:
+  - System shortcuts (e.g., `Ctrl+C`, `Ctrl+V`)
+  - Application shortcuts in your frequently used apps
+  - Other global hotkey tools
+</Note>
+
+### Ergonomic Choices
+
+- **Easy to reach**: Choose keys near your home row
+- **One-handed**: `Ctrl+Space` is easier than `Ctrl+Alt+Shift+F12`
+- **Muscle memory**: Keep hotkeys consistent across updates
+- **Left hand**: Frees your right hand for mouse/trackpad
+
+### Recommended Combinations
+
+```yaml
+Push-to-talk suggestions:
+  - Ctrl+Space (default, easy one-handed)
+  - Ctrl+` (backtick key, out of the way)
+  - Alt+Space (alternative to Ctrl)
+  - F13-F24 (if you have an extended keyboard)
+
+Command hotkey suggestions:
+  - Ctrl+Shift+Space (default, builds on push-to-talk)
+  - Ctrl+Shift+A (mnemonic: "Assistant")
+  - Alt+Shift+Space (alternative modifier)
+```
+
+## Capture Modes
+
+<ParamField path="captureMode" type="CaptureMode" default="push-to-talk">
+  Hotkey behavior mode
+  
+  - `push-to-talk` - Hold hotkey to record, release to stop (default)
+  - `single-tap` - Press once to start, press again to stop
+  
+  <Note>
+    Push-to-talk is recommended for faster, more natural dictation.
+  </Note>
+</ParamField>
+
+## Troubleshooting
+
+<Accordion title="Hotkey not working">
+  1. Check if another app is using the same hotkey
+  2. Verify SlasshyWispr is running (check system tray)
+  3. Try a different key combination
+  4. Restart SlasshyWispr
+  5. Check OS permissions for global shortcuts
+</Accordion>
+
+<Accordion title="Hotkey triggers wrong action">
+  1. Open Settings and verify the hotkey assignment
+  2. Make sure you're using the correct hotkey (push-to-talk vs command)
+  3. Check capture mode setting
+  4. Reset to defaults and reconfigure
+</Accordion>
+
+<Accordion title="Hotkey works intermittently">
+  1. Check if conflicting apps are stealing focus
+  2. Verify your keyboard connection (wireless/USB)
+  3. Look for modifier key stickiness (Ctrl/Shift stuck)
+  4. Check if SlasshyWispr has proper accessibility permissions
+</Accordion>

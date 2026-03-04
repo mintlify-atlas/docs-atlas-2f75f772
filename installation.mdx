@@ -1,0 +1,228 @@
+---
+title: Installation
+description: Complete installation guide for SlasshyWispr with system requirements, download instructions, and update procedures.
+---
+
+# Installation Guide
+
+This guide covers everything you need to install and run SlasshyWispr on your Windows system.
+
+## System Requirements
+
+### Minimum Requirements
+
+- **Operating System**: Windows 10 or later
+- **RAM**: 4 GB minimum (8 GB recommended for local models)
+- **Disk Space**: 
+  - Base installation: ~200 MB
+  - Local STT models: 60 MB - 1.6 GB per model
+  - Local AI models (Ollama): 2-8 GB per model
+- **Microphone**: Any working microphone or headset
+- **Internet**: Required for online mode and initial setup
+
+### Recommended for Offline Models
+
+<Info>
+SlasshyWispr includes hardware detection to recommend appropriate local STT models based on your system capabilities.
+</Info>
+
+**For Local STT (Offline Speech-to-Text):**
+- **CPU**: Modern multi-core processor (4+ cores recommended)
+- **RAM**: 8 GB or more
+- **GPU** (Optional): NVIDIA GPU with CUDA support for faster processing
+
+**For Local AI (Ollama):**
+- **RAM**: 16 GB recommended for larger models
+- **GPU** (Optional): NVIDIA GPU with 6+ GB VRAM for faster inference
+
+### Supported Local Models
+
+**STT Models:**
+- Parakeet v3 (478 MB) - Fast, accurate, recommended
+- Parakeet v2 (473 MB) - Previous generation
+- Whisper Large v3 Turbo (1.6 GB) - High accuracy, slower
+- Whisper Medium (492 MB) - Balanced
+- Whisper Small (487 MB) - Fast, lower accuracy
+- Moonshine Base (58 MB) - Tiny, fastest
+- SenseVoice Small (160 MB) - Compact option
+
+**AI Models (via Ollama):**
+- Any model supported by Ollama (llama3, mistral, phi, etc.)
+
+## Download SlasshyWispr
+
+<Steps>
+  <Step title="Visit the Releases page">
+    Navigate to the official [GitHub Releases page](https://github.com/SlasshyOverhere/SlasshyWispr/releases/latest).
+  </Step>
+  
+  <Step title="Download the installer">
+    Under the latest release, find the **Assets** section and download the Windows installer:
+    
+    - Look for `.exe` or `.msi` file
+    - File name will be similar to: `SlasshyWispr-0.1.5-setup.exe`
+    
+    <Tip>
+    Always download from the official GitHub repository to ensure you get the authentic, unmodified application.
+    </Tip>
+  </Step>
+</Steps>
+
+## Install SlasshyWispr
+
+<Steps>
+  <Step title="Run the installer">
+    Double-click the downloaded installer file to begin installation.
+  </Step>
+  
+  <Step title="Handle security warnings">
+    Windows may display a SmartScreen warning because the app is not yet widely recognized.
+    
+    To proceed:
+    1. Click **"More info"**
+    2. Click **"Run anyway"**
+    
+    <Warning>
+    Only bypass this warning if you downloaded the installer from the official GitHub repository.
+    </Warning>
+  </Step>
+  
+  <Step title="Follow installation wizard">
+    The installer will guide you through:
+    
+    - License agreement acceptance
+    - Installation location selection (default is recommended)
+    - Start Menu shortcut creation
+    - Desktop shortcut (optional)
+    
+    Click **Install** to begin the installation process.
+  </Step>
+  
+  <Step title="Complete installation">
+    Wait for the installation to complete (usually takes under 1 minute).
+    
+    Once finished, you can choose to launch SlasshyWispr immediately.
+  </Step>
+</Steps>
+
+## Verify Installation
+
+After installation completes:
+
+<Steps>
+  <Step title="Launch the application">
+    Open SlasshyWispr from:
+    - Start Menu: Search for "SlasshyWispr"
+    - Desktop shortcut (if created during installation)
+  </Step>
+  
+  <Step title="Check version">
+    The current version (e.g., `0.1.5`) should be visible in the app interface or in **Settings > Update and Security**.
+  </Step>
+  
+  <Step title="Test microphone access">
+    Navigate to **Settings > General** and verify your microphone appears in the device list.
+    
+    If your microphone is not detected, check Windows microphone permissions.
+  </Step>
+</Steps>
+
+<Note>
+On first launch, Windows Firewall may prompt you to allow network access. Grant access if you plan to use online models or check for updates.
+</Note>
+
+## Post-Installation Setup
+
+After verifying installation, proceed with initial configuration:
+
+1. **Choose Runtime Modes**: Navigate to **Settings > Models** to select Online, Offline, or Hybrid mode
+2. **Configure API Keys** (if using online mode)
+3. **Download Local Models** (if using offline mode)
+4. **Set Hotkeys**: Configure your preferred keyboard shortcuts in **Settings > General**
+
+See the [Quickstart Guide](/quickstart) for detailed setup instructions.
+
+## Updates
+
+SlasshyWispr provides two methods for updating:
+
+### In-App Updates (Recommended)
+
+<Steps>
+  <Step title="Check for updates">
+    Navigate to **Settings > Update and Security**.
+    
+    SlasshyWispr will check for available updates from the GitHub releases.
+  </Step>
+  
+  <Step title="Review release notes">
+    If an update is available, you'll see:
+    - Latest version number
+    - Release notes and changelog
+    - Published date
+  </Step>
+  
+  <Step title="Install update">
+    Click **Install Update** to download and install the latest version.
+    
+    The app will download the installer and guide you through the update process.
+  </Step>
+</Steps>
+
+### Manual Updates
+
+Alternatively, you can update manually:
+
+1. Visit the [Releases page](https://github.com/SlasshyOverhere/SlasshyWispr/releases/latest)
+2. Download the latest installer
+3. Run the installer (it will upgrade your existing installation)
+4. Your settings and data will be preserved
+
+<Warning>
+Manual updates require administrator privileges. Close SlasshyWispr before running the new installer.
+</Warning>
+
+## Uninstall
+
+To remove SlasshyWispr from your system:
+
+1. Open **Windows Settings > Apps > Installed Apps**
+2. Find **SlasshyWispr** in the list
+3. Click the three-dot menu and select **Uninstall**
+4. Follow the uninstall wizard
+
+<Info>
+Uninstalling removes the application but may preserve settings in your user directory. To completely remove all data, manually delete the SlasshyWispr folder from `%APPDATA%`.
+</Info>
+
+## Troubleshooting Installation
+
+### Installer won't run
+
+- Ensure you have administrator privileges
+- Temporarily disable antivirus software
+- Verify the downloaded file is not corrupted (re-download if necessary)
+
+### Application won't launch
+
+- Check Windows Event Viewer for error logs
+- Ensure .NET runtime is installed (usually bundled with Windows 10+)
+- Try reinstalling the application
+
+### Microphone not detected
+
+- Check Windows microphone permissions: **Settings > Privacy > Microphone**
+- Ensure your microphone is set as the default recording device
+- Restart SlasshyWispr after connecting a new microphone
+
+---
+
+<CardGroup cols={2}>
+  <Card title="Quickstart Guide" icon="rocket" href="/quickstart">
+    Complete your first dictation and configure basic settings.
+  </Card>
+  
+  <Card title="Get Help" icon="life-ring" href="/guides/troubleshooting">
+    Troubleshooting guide and community support.
+  </Card>
+</CardGroup>

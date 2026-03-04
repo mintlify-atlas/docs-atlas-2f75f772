@@ -1,0 +1,238 @@
+---
+title: Local STT Models
+description: Available speech-to-text models for offline transcription in SlasshyWispr
+---
+
+SlasshyWispr supports multiple local STT (Speech-to-Text) models for offline transcription, powered by the native Parakeet runtime via `transcribe-rs`.
+
+## Available Models
+
+Choose from several high-quality models optimized for different performance and accuracy requirements:
+
+<CardGroup cols={2}>
+  <Card title="Parakeet v3" icon="rocket">
+    **nvidia/parakeet-tdt-0.6b-v3**
+    
+    Size: 478 MB
+    
+    Latest NVIDIA Parakeet model with improved accuracy
+  </Card>
+  
+  <Card title="Whisper Turbo" icon="bolt">
+    **openai/whisper-large-v3-turbo**
+    
+    Size: 1.6 GB
+    
+    Fastest large Whisper model with excellent accuracy
+  </Card>
+  
+  <Card title="Moonshine Base" icon="moon">
+    **UsefulSensors/moonshine-base**
+    
+    Size: 58.0 MB
+    
+    Smallest model, ideal for low-resource systems
+  </Card>
+  
+  <Card title="SenseVoice" icon="microphone">
+    **FunAudioLLM/SenseVoiceSmall**
+    
+    Size: 160 MB
+    
+    Compact multilingual model with emotion detection
+  </Card>
+</CardGroup>
+
+### Complete Model List
+
+| Model | Size | Description |
+|-------|------|-------------|
+| nvidia/parakeet-tdt-0.6b-v3 | 478 MB | Parakeet v3 - Latest generation |
+| nvidia/parakeet-tdt_ctc-110m | 473 MB | Parakeet v2 - Previous generation |
+| nvidia/parakeet-tdt-0.6b-v2 | 473 MB | Parakeet v2 (alternate) |
+| openai/whisper-large-v3-turbo | 1.6 GB | Whisper Turbo - Fastest large model |
+| openai/whisper-large-v3 | 1.1 GB | Whisper Large - High accuracy |
+| openai/whisper-medium | 492 MB | Whisper Medium - Balanced |
+| openai/whisper-small | 487 MB | Whisper Small - Efficient |
+| UsefulSensors/moonshine-base | 58.0 MB | Moonshine - Smallest footprint |
+| FunAudioLLM/SenseVoiceSmall | 160 MB | SenseVoice - Multilingual |
+
+## Model Performance
+
+### Performance Tiers
+
+<Steps>
+  <Step title="High Performance">
+    **Whisper Turbo** and **Whisper Large** models offer the highest accuracy but require more RAM and processing power.
+    
+    Recommended for: High-end systems with 16GB+ RAM
+  </Step>
+  
+  <Step title="Balanced Performance">
+    **Parakeet v3**, **Whisper Medium**, and **Whisper Small** provide excellent accuracy with moderate resource usage.
+    
+    Recommended for: Mid-range systems with 8-16GB RAM
+  </Step>
+  
+  <Step title="Lightweight Performance">
+    **Moonshine** and **SenseVoice** are optimized for minimal resource consumption.
+    
+    Recommended for: Low-resource systems with 4-8GB RAM
+  </Step>
+</Steps>
+
+<Info>
+  SlasshyWispr will analyze your hardware and recommend the best model for your system. See [Hardware Requirements](/local/hardware-requirements) for details.
+</Info>
+
+## Download and Installation
+
+<Steps>
+  <Step title="Access Local Settings">
+    Navigate to **Settings** > **Offline** tab in SlasshyWispr
+  </Step>
+  
+  <Step title="Select a Model">
+    Choose a model from the STT Model dropdown based on your hardware capabilities
+  </Step>
+  
+  <Step title="Download the Model">
+    Click **Download Model** to begin downloading from Hugging Face
+    
+    The download progress will be displayed with:
+    - Current file being downloaded
+    - Download percentage
+    - Files completed / total files
+    - Downloaded bytes / total bytes
+  </Step>
+  
+  <Step title="Wait for Completion">
+    Large models may take several minutes to download depending on your internet connection
+  </Step>
+</Steps>
+
+<Note>
+  Models are downloaded from Hugging Face and stored locally in your SlasshyWispr data directory. Once downloaded, they can be used completely offline.
+</Note>
+
+## Model Warmup Process
+
+Before first use, models need to be "warmed up" to load into memory and optimize performance.
+
+### What is Warmup?
+
+Warmup involves:
+1. Loading the model into memory
+2. Initializing the inference engine
+3. Running a test transcription to optimize caching
+4. Preparing the model for real-time use
+
+### When Does Warmup Happen?
+
+<Info>
+  Warmup occurs automatically when you:
+  - Select a model for the first time
+  - Switch to a different model
+  - Restart SlasshyWispr with a local model enabled
+</Info>
+
+### Warmup Duration
+
+Warmup time varies by model size:
+- **Small models** (< 100 MB): 5-10 seconds
+- **Medium models** (400-500 MB): 10-20 seconds
+- **Large models** (> 1 GB): 20-40 seconds
+
+<Warning>
+  Do not close SlasshyWispr during model warmup. The warmup process must complete for transcription to work properly.
+</Warning>
+
+## Native Parakeet Runtime
+
+SlasshyWispr uses **transcribe-rs** with native Parakeet support for high-performance local transcription.
+
+### Key Features
+
+- **Zero Python Dependencies**: All models run natively in Rust via ONNX Runtime
+- **Low Latency**: Optimized for real-time transcription with minimal delay
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **GPU Acceleration**: Automatic NVIDIA GPU detection and utilization when available
+- **Memory Efficient**: Smart memory management for concurrent model loading
+
+### Runtime Architecture
+
+The local STT runtime:
+1. Uses **ONNX Runtime 2.0** (`ort = "2.0.0-rc.10"`) for model inference
+2. Leverages **transcribe-rs** with Parakeet features enabled
+3. Manages model lifecycle (download, warmup, deactivate)
+4. Handles audio preprocessing and post-processing
+5. Provides daemon mode for keeping models hot in memory
+
+<Info>
+  The runtime automatically manages multiple model instances and can keep models "hot" in memory for instant transcription when you start dictating.
+</Info>
+
+## Model Management
+
+### Checking Model Status
+
+You can check if a model is:
+- Downloaded and available locally
+- Currently loaded in memory (warmed up)
+- Active and ready for transcription
+
+### Deleting Models
+
+To free up disk space, you can delete downloaded models through Settings > Offline. This removes the model files from your local storage.
+
+<Warning>
+  Deleting a model requires re-downloading it before you can use it again. Make sure you have an internet connection when you need to re-download.
+</Warning>
+
+### Opening Model Directory
+
+You can open the local model storage directory to inspect or manually manage model files.
+
+## Best Practices
+
+<Steps>
+  <Step title="Start with Recommended Model">
+    Use SlasshyWispr's hardware advisor to select the optimal model for your system
+  </Step>
+  
+  <Step title="Test Multiple Models">
+    Try different models to find the best balance of speed and accuracy for your use case
+  </Step>
+  
+  <Step title="Keep Models Updated">
+    Newer model versions (like Parakeet v3) often have improved accuracy
+  </Step>
+  
+  <Step title="Monitor Performance">
+    Check STT latency in the pipeline settings to ensure smooth real-time transcription
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Model Won't Download
+
+- Check your internet connection
+- Ensure you have sufficient disk space (check model size above)
+- Verify Hugging Face is accessible from your network
+
+### Slow Transcription
+
+- Try a smaller model (Moonshine, SenseVoice, or Whisper Small)
+- Check if your system meets the [hardware requirements](/local/hardware-requirements)
+- Close other resource-intensive applications
+
+### Model Warmup Fails
+
+- Ensure sufficient RAM is available
+- Try restarting SlasshyWispr
+- Check the logs for specific error messages
+
+<Info>
+  For GPU-accelerated transcription, see [Hardware Requirements](/local/hardware-requirements) for NVIDIA GPU setup.
+</Info>

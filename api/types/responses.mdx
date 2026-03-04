@@ -1,0 +1,887 @@
+---
+title: "Response Types"
+description: "API response interfaces for SlasshyWispr backend operations"
+---
+
+## Pipeline Responses
+
+### AssistantPipelineResponse
+
+```typescript
+interface AssistantPipelineResponse {
+  mode: "assistant" | "dictation";
+  selectionRewrite: boolean;
+  selectionPending: boolean;
+  selectionContextCleared: boolean;
+  selectionContextUsed: boolean;
+  transcript: string;
+  assistantResponse: string;
+  audioBase64: string;
+  sttLatencyMs: number;
+  aiLatencyMs: number;
+  ttsLatencyMs: number;
+  totalLatencyMs: number;
+}
+```
+
+Complete response from the assistant processing pipeline.
+
+<ResponseField name="mode" type="string">
+  Pipeline mode: `"assistant"` (AI response) or `"dictation"` (transcription only)
+</ResponseField>
+
+<ResponseField name="selectionRewrite" type="boolean">
+  Whether the request was to rewrite selected text
+</ResponseField>
+
+<ResponseField name="selectionPending" type="boolean">
+  Selection popup is awaiting user action
+</ResponseField>
+
+<ResponseField name="selectionContextCleared" type="boolean">
+  Previously stored selection context was cleared
+</ResponseField>
+
+<ResponseField name="selectionContextUsed" type="boolean">
+  Selection context was used in the request
+</ResponseField>
+
+<ResponseField name="transcript" type="string">
+  Transcribed text from speech input
+</ResponseField>
+
+<ResponseField name="assistantResponse" type="string">
+  AI-generated response text
+</ResponseField>
+
+<ResponseField name="audioBase64" type="string">
+  Base64-encoded TTS audio output
+</ResponseField>
+
+<ResponseField name="sttLatencyMs" type="number">
+  Speech-to-text processing time in milliseconds
+</ResponseField>
+
+<ResponseField name="aiLatencyMs" type="number">
+  AI model inference time in milliseconds
+</ResponseField>
+
+<ResponseField name="ttsLatencyMs" type="number">
+  Text-to-speech generation time in milliseconds
+</ResponseField>
+
+<ResponseField name="totalLatencyMs" type="number">
+  Total pipeline latency in milliseconds
+</ResponseField>
+
+---
+
+## System Information
+
+### AssistantInfoResponse
+
+```typescript
+interface AssistantInfoResponse {
+  appVersion: string;
+  baseUrl: string;
+  sttModel: string;
+  aiModel: string;
+  piperInstalled: boolean;
+  piperPath: string;
+  voiceInstalled: boolean;
+  voiceModelPath: string;
+  coquiInstalled: boolean;
+  coquiPythonPath: string;
+}
+```
+
+System configuration and installation status.
+
+<ResponseField name="appVersion" type="string">
+  Application version number
+</ResponseField>
+
+<ResponseField name="baseUrl" type="string">
+  API base URL
+</ResponseField>
+
+<ResponseField name="sttModel" type="string">
+  Active STT model name
+</ResponseField>
+
+<ResponseField name="aiModel" type="string">
+  Active AI model name
+</ResponseField>
+
+<ResponseField name="piperInstalled" type="boolean">
+  Piper TTS installation status
+</ResponseField>
+
+<ResponseField name="piperPath" type="string">
+  Path to Piper executable
+</ResponseField>
+
+<ResponseField name="voiceInstalled" type="boolean">
+  Voice model installation status
+</ResponseField>
+
+<ResponseField name="voiceModelPath" type="string">
+  Path to voice model files
+</ResponseField>
+
+<ResponseField name="coquiInstalled" type="boolean">
+  Coqui TTS installation status
+</ResponseField>
+
+<ResponseField name="coquiPythonPath" type="string">
+  Path to Python with Coqui
+</ResponseField>
+
+---
+
+### AppUpdateCheckResponse
+
+```typescript
+interface AppUpdateCheckResponse {
+  currentVersion: string;
+  latestVersion: string;
+  available: boolean;
+  releaseName: string;
+  releaseNotes: string;
+  publishedAt: string;
+  releaseUrl: string;
+  installerDownloadUrl: string;
+  installerAssetName: string;
+}
+```
+
+Application update availability and details.
+
+<ResponseField name="currentVersion" type="string">
+  Currently installed version
+</ResponseField>
+
+<ResponseField name="latestVersion" type="string">
+  Latest available version
+</ResponseField>
+
+<ResponseField name="available" type="boolean">
+  Whether an update is available
+</ResponseField>
+
+<ResponseField name="releaseName" type="string">
+  Name of the latest release
+</ResponseField>
+
+<ResponseField name="releaseNotes" type="string">
+  Markdown-formatted release notes
+</ResponseField>
+
+<ResponseField name="publishedAt" type="string">
+  ISO 8601 publication timestamp
+</ResponseField>
+
+<ResponseField name="releaseUrl" type="string">
+  GitHub release page URL
+</ResponseField>
+
+<ResponseField name="installerDownloadUrl" type="string">
+  Direct download URL for installer
+</ResponseField>
+
+<ResponseField name="installerAssetName" type="string">
+  Installer file name
+</ResponseField>
+
+---
+
+## Local STT Responses
+
+### LocalSttDownloadStatusResponse
+
+```typescript
+interface LocalSttDownloadStatusResponse {
+  active: boolean;
+  completed: boolean;
+  success: boolean;
+  model: string;
+  repoId: string;
+  stage: string;
+  message: string;
+  currentFile: string;
+  downloadedBytes: number;
+  totalBytes: number;
+  filesCompleted: number;
+  filesTotal: number;
+  progressPercent: number;
+  updatedAtMs: number;
+}
+```
+
+Real-time download progress for local STT models.
+
+<ResponseField name="active" type="boolean">
+  Download is currently in progress
+</ResponseField>
+
+<ResponseField name="completed" type="boolean">
+  Download has finished (success or failure)
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  Download completed successfully
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  Model identifier
+</ResponseField>
+
+<ResponseField name="repoId" type="string">
+  Repository ID (e.g., Hugging Face)
+</ResponseField>
+
+<ResponseField name="stage" type="string">
+  Current stage (e.g., "downloading", "extracting")
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable status message
+</ResponseField>
+
+<ResponseField name="currentFile" type="string">
+  File currently being downloaded
+</ResponseField>
+
+<ResponseField name="downloadedBytes" type="number">
+  Bytes downloaded so far
+</ResponseField>
+
+<ResponseField name="totalBytes" type="number">
+  Total size in bytes
+</ResponseField>
+
+<ResponseField name="filesCompleted" type="number">
+  Number of files completed
+</ResponseField>
+
+<ResponseField name="filesTotal" type="number">
+  Total number of files
+</ResponseField>
+
+<ResponseField name="progressPercent" type="number">
+  Overall progress (0-100)
+</ResponseField>
+
+<ResponseField name="updatedAtMs" type="number">
+  Last update timestamp (milliseconds)
+</ResponseField>
+
+---
+
+### LocalSttHardwareAdviceResponse
+
+```typescript
+interface LocalSttHardwareAdviceResponse {
+  cpuName: string;
+  logicalCores: number;
+  totalRamGb: number;
+  nvidiaGpuDetected: boolean;
+  gpuName: string;
+  gpuVramGb: number;
+  performanceTier: string;
+  slasshySuggestionModel: string;
+  suggestedModels: string[];
+  cautionModels: string[];
+  selectedModelWarning: string;
+  details: string;
+}
+```
+
+Hardware detection and model recommendations.
+
+<ResponseField name="cpuName" type="string">
+  CPU model name
+</ResponseField>
+
+<ResponseField name="logicalCores" type="number">
+  Number of logical CPU cores
+</ResponseField>
+
+<ResponseField name="totalRamGb" type="number">
+  Total system RAM in GB
+</ResponseField>
+
+<ResponseField name="nvidiaGpuDetected" type="boolean">
+  NVIDIA GPU availability
+</ResponseField>
+
+<ResponseField name="gpuName" type="string">
+  GPU model name
+</ResponseField>
+
+<ResponseField name="gpuVramGb" type="number">
+  GPU VRAM in GB
+</ResponseField>
+
+<ResponseField name="performanceTier" type="string">
+  System performance tier (low/medium/high)
+</ResponseField>
+
+<ResponseField name="slasshySuggestionModel" type="string">
+  Primary recommended model
+</ResponseField>
+
+<ResponseField name="suggestedModels" type="string[]">
+  List of recommended models
+</ResponseField>
+
+<ResponseField name="cautionModels" type="string[]">
+  Models that may have performance issues
+</ResponseField>
+
+<ResponseField name="selectedModelWarning" type="string">
+  Warning message if selected model is problematic
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Additional hardware details
+</ResponseField>
+
+---
+
+### LocalSttDownloadResponse
+
+```typescript
+interface LocalSttDownloadResponse {
+  model: string;
+  provider: string;
+  method: string;
+  localPath: string;
+  details: string;
+}
+```
+
+<ResponseField name="model" type="string">
+  Downloaded model identifier
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Model provider (e.g., "huggingface")
+</ResponseField>
+
+<ResponseField name="method" type="string">
+  Download method used
+</ResponseField>
+
+<ResponseField name="localPath" type="string">
+  Local filesystem path
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Additional information
+</ResponseField>
+
+---
+
+### LocalSttDeleteResponse
+
+```typescript
+interface LocalSttDeleteResponse {
+  model: string;
+  repoId: string;
+  removed: boolean;
+  localPath: string;
+  details: string;
+}
+```
+
+<ResponseField name="model" type="string">
+  Model identifier
+</ResponseField>
+
+<ResponseField name="repoId" type="string">
+  Repository ID
+</ResponseField>
+
+<ResponseField name="removed" type="boolean">
+  Whether removal was successful
+</ResponseField>
+
+<ResponseField name="localPath" type="string">
+  Path that was removed
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Operation details
+</ResponseField>
+
+---
+
+### LocalSttOpenPathResponse
+
+```typescript
+interface LocalSttOpenPathResponse {
+  model: string;
+  repoId: string;
+  localPath: string;
+  opened: boolean;
+  details: string;
+}
+```
+
+<ResponseField name="model" type="string">
+  Model identifier
+</ResponseField>
+
+<ResponseField name="repoId" type="string">
+  Repository ID
+</ResponseField>
+
+<ResponseField name="localPath" type="string">
+  Path to open
+</ResponseField>
+
+<ResponseField name="opened" type="boolean">
+  Whether path was opened successfully
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Operation details
+</ResponseField>
+
+---
+
+### LocalSttWarmupResponse
+
+```typescript
+interface LocalSttWarmupResponse {
+  model: string;
+  provider: string;
+  warmed: boolean;
+  details: string;
+}
+```
+
+<ResponseField name="model" type="string">
+  Model identifier
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Model provider
+</ResponseField>
+
+<ResponseField name="warmed" type="boolean">
+  Whether warmup was successful
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Warmup details
+</ResponseField>
+
+---
+
+### LocalSttDeactivateResponse
+
+```typescript
+interface LocalSttDeactivateResponse {
+  model: string;
+  provider: string;
+  deactivated: boolean;
+  details: string;
+}
+```
+
+<ResponseField name="model" type="string">
+  Model identifier
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Model provider
+</ResponseField>
+
+<ResponseField name="deactivated" type="boolean">
+  Whether deactivation was successful
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Deactivation details
+</ResponseField>
+
+---
+
+### LocalSttRuntimeStateResponse
+
+```typescript
+interface LocalSttRuntimeStateResponse {
+  loaded: boolean;
+  daemonCount: number;
+  loadedDaemonCount: number;
+  details: string;
+}
+```
+
+<ResponseField name="loaded" type="boolean">
+  Whether STT runtime is loaded
+</ResponseField>
+
+<ResponseField name="daemonCount" type="number">
+  Total number of daemon processes
+</ResponseField>
+
+<ResponseField name="loadedDaemonCount" type="number">
+  Number of loaded daemon processes
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Runtime state details
+</ResponseField>
+
+---
+
+## Ollama Responses
+
+### OllamaStatusResponse
+
+```typescript
+interface OllamaStatusResponse {
+  installed: boolean;
+  running: boolean;
+  version: string;
+  details: string;
+}
+```
+
+Ollama installation and runtime status.
+
+<ResponseField name="installed" type="boolean">
+  Whether Ollama is installed
+</ResponseField>
+
+<ResponseField name="running" type="boolean">
+  Whether Ollama service is running
+</ResponseField>
+
+<ResponseField name="version" type="string">
+  Ollama version string
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Additional status information
+</ResponseField>
+
+---
+
+### OllamaPullResponse
+
+```typescript
+interface OllamaPullResponse {
+  baseUrl: string;
+  model: string;
+  ok: boolean;
+  status: string;
+}
+```
+
+Result of pulling an Ollama model.
+
+<ResponseField name="baseUrl" type="string">
+  Ollama server URL
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  Model name that was pulled
+</ResponseField>
+
+<ResponseField name="ok" type="boolean">
+  Whether pull was successful
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Status message
+</ResponseField>
+
+---
+
+### ProviderModelsResponse
+
+```typescript
+interface ProviderModelsResponse {
+  baseUrl: string;
+  models: string[];
+}
+```
+
+<ResponseField name="baseUrl" type="string">
+  Provider API base URL
+</ResponseField>
+
+<ResponseField name="models" type="string[]">
+  Available model identifiers
+</ResponseField>
+
+---
+
+## TTS Responses
+
+### CoquiStatusResponse
+
+```typescript
+interface CoquiStatusResponse {
+  available: boolean;
+  pythonPath: string;
+  ttsVersion: string;
+  cudaAvailable: boolean;
+  voiceDir: string;
+  voices: string[];
+  defaultModel: string;
+  error: string;
+}
+```
+
+Coqui TTS installation and configuration status.
+
+<ResponseField name="available" type="boolean">
+  Whether Coqui TTS is available
+</ResponseField>
+
+<ResponseField name="pythonPath" type="string">
+  Path to Python with Coqui installed
+</ResponseField>
+
+<ResponseField name="ttsVersion" type="string">
+  Coqui TTS version string
+</ResponseField>
+
+<ResponseField name="cudaAvailable" type="boolean">
+  Whether CUDA GPU acceleration is available
+</ResponseField>
+
+<ResponseField name="voiceDir" type="string">
+  Directory containing voice models
+</ResponseField>
+
+<ResponseField name="voices" type="string[]">
+  Available voice IDs
+</ResponseField>
+
+<ResponseField name="defaultModel" type="string">
+  Default Coqui model name
+</ResponseField>
+
+<ResponseField name="error" type="string">
+  Error message if unavailable
+</ResponseField>
+
+---
+
+### CoquiSetupResponse
+
+```typescript
+interface CoquiSetupResponse {
+  pythonPath: string;
+  details: string;
+}
+```
+
+<ResponseField name="pythonPath" type="string">
+  Path to configured Python
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Setup details
+</ResponseField>
+
+---
+
+### CoquiValidationResponse
+
+```typescript
+interface CoquiValidationResponse {
+  ok: boolean;
+  details: string;
+}
+```
+
+<ResponseField name="ok" type="boolean">
+  Whether validation passed
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Validation details or error message
+</ResponseField>
+
+---
+
+### CoquiVoicesResponse
+
+```typescript
+interface CoquiVoicesResponse {
+  voiceDir: string;
+  voices: string[];
+}
+```
+
+<ResponseField name="voiceDir" type="string">
+  Voice directory path
+</ResponseField>
+
+<ResponseField name="voices" type="string[]">
+  List of available voice IDs
+</ResponseField>
+
+---
+
+### CoquiModelsResponse
+
+```typescript
+interface CoquiModelsResponse {
+  models: string[];
+}
+```
+
+<ResponseField name="models" type="string[]">
+  Available Coqui TTS models
+</ResponseField>
+
+---
+
+### CoquiVoiceCloneResponse
+
+```typescript
+interface CoquiVoiceCloneResponse {
+  speakerId: string;
+  durationSeconds: number;
+  voiceDir: string;
+  voices: string[];
+  previewAudioBase64: string;
+}
+```
+
+Result of voice cloning operation.
+
+<ResponseField name="speakerId" type="string">
+  Generated speaker/voice ID
+</ResponseField>
+
+<ResponseField name="durationSeconds" type="number">
+  Duration of reference audio used
+</ResponseField>
+
+<ResponseField name="voiceDir" type="string">
+  Directory where voice is stored
+</ResponseField>
+
+<ResponseField name="voices" type="string[]">
+  Updated list of available voices
+</ResponseField>
+
+<ResponseField name="previewAudioBase64" type="string">
+  Base64-encoded preview audio
+</ResponseField>
+
+---
+
+### CoquiVoicePreviewResponse
+
+```typescript
+interface CoquiVoicePreviewResponse {
+  audioBase64: string;
+  text: string;
+}
+```
+
+<ResponseField name="audioBase64" type="string">
+  Base64-encoded preview audio
+</ResponseField>
+
+<ResponseField name="text" type="string">
+  Text that was synthesized
+</ResponseField>
+
+---
+
+### PiperValidationResponse
+
+```typescript
+interface PiperValidationResponse {
+  ok: boolean;
+  details: string;
+}
+```
+
+<ResponseField name="ok" type="boolean">
+  Whether Piper validation passed
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Validation details or error message
+</ResponseField>
+
+---
+
+### RuntimeSetupResponse
+
+```typescript
+interface RuntimeSetupResponse {
+  piperPath: string;
+  voiceModelPath: string;
+}
+```
+
+<ResponseField name="piperPath" type="string">
+  Path to Piper executable
+</ResponseField>
+
+<ResponseField name="voiceModelPath" type="string">
+  Path to voice model files
+</ResponseField>
+
+---
+
+### VoiceInstallResponse
+
+```typescript
+interface VoiceInstallResponse {
+  modelPath: string;
+}
+```
+
+<ResponseField name="modelPath" type="string">
+  Path where voice model was installed
+</ResponseField>
+
+---
+
+### TtsSetupStatusResponse
+
+```typescript
+interface TtsSetupStatusResponse {
+  running: boolean;
+  completed: boolean;
+  success: boolean;
+  stage: string;
+  logs: string[];
+}
+```
+
+Status of TTS setup process.
+
+<ResponseField name="running" type="boolean">
+  Setup is currently running
+</ResponseField>
+
+<ResponseField name="completed" type="boolean">
+  Setup has finished
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  Setup completed successfully
+</ResponseField>
+
+<ResponseField name="stage" type="string">
+  Current setup stage
+</ResponseField>
+
+<ResponseField name="logs" type="string[]">
+  Setup log messages
+</ResponseField>

@@ -1,0 +1,272 @@
+---
+title: Text-to-Speech Setup
+description: Configure TTS engines, voices, and playback settings for assistant responses
+---
+
+SlasshyWispr includes built-in text-to-speech (TTS) for reading assistant responses aloud. Choose between Piper (fast, zero-Python) and Coqui (high-quality, requires Python).
+
+## TTS Engine Selection
+
+<ParamField path="ttsEngine" type="TtsEngine" default="piper">
+  Text-to-speech engine
+  
+  - `piper` - Fast, lightweight, zero-dependency TTS (default)
+  - `coqui` - High-quality neural TTS with voice cloning (requires Python setup)
+  
+  <Note>
+    Coqui is disabled in zero-Python mode. If `ZERO_PYTHON_MODE = true`, only Piper is available.
+  </Note>
+</ParamField>
+
+## Piper Configuration
+
+Piper is the default TTS engine: lightweight, fast, and requires no external dependencies.
+
+<ParamField path="piperPath" type="string" default="">
+  Path to Piper executable
+  
+  SlasshyWispr automatically installs and configures Piper on first run. This setting is managed internally.
+</ParamField>
+
+<ParamField path="piperSpeed" type="number" default="1.08">
+  Piper speech rate multiplier
+  
+  - Range: `0.5` to `2.0`
+  - `1.0` = normal speed
+  - `1.08` = slightly faster (default)
+  - `1.5` = 50% faster
+  - `0.8` = 20% slower
+</ParamField>
+
+<ParamField path="piperQuality" type="PiperQuality" default="fast">
+  Piper voice quality preset
+  
+  - `fast` - Fastest inference, good quality (default)
+  - `balanced` - Balanced speed and quality
+  - `high` - Best quality, slower inference
+</ParamField>
+
+<ParamField path="piperEmotion" type="PiperEmotion" default="neutral">
+  Piper emotional tone
+  
+  - `neutral` - Standard neutral voice (default)
+  - `calm` - Calming, relaxed tone
+  - `happy` - Upbeat, cheerful tone
+  - `excited` - Energetic, enthusiastic tone
+  - `serious` - Professional, formal tone
+  - `sad` - Somber, low-energy tone
+  
+  <Note>
+    Emotion support depends on the installed voice model. Not all emotions may be available.
+  </Note>
+</ParamField>
+
+## Coqui Configuration
+
+Coqui TTS provides studio-quality neural voices with voice cloning capabilities.
+
+<Note>
+  Coqui requires Python and additional setup. It is disabled when `ZERO_PYTHON_MODE = true`.
+</Note>
+
+<ParamField path="coquiPythonPath" type="string" default="">
+  Path to Python executable for Coqui
+  
+  Must point to a Python installation with TTS library installed:
+  
+  ```bash
+  pip install TTS
+  ```
+</ParamField>
+
+<ParamField path="coquiModelName" type="string" default="tts_models/multilingual/multi-dataset/xtts_v2">
+  Coqui TTS model identifier
+  
+  Default model is XTTS v2, a multilingual neural TTS model.
+  
+  Other options:
+  - `tts_models/en/ljspeech/tacotron2-DDC`
+  - `tts_models/en/vctk/vits`
+  - See Coqui model list: `tts --list_models`
+</ParamField>
+
+<ParamField path="coquiLanguage" type="string" default="en">
+  Language code for Coqui TTS
+  
+  Supported languages depend on the model. XTTS v2 supports:
+  - `en` - English (default)
+  - `es` - Spanish
+  - `fr` - French
+  - `de` - German
+  - `it` - Italian
+  - `pt` - Portuguese
+  - `zh` - Chinese
+  - And more...
+</ParamField>
+
+<ParamField path="coquiVoiceId" type="string" default="">
+  Voice speaker ID or cloned voice file
+  
+  - For built-in voices: speaker ID (e.g., `p225`, `p226`)
+  - For cloned voices: path to reference audio file
+  
+  <Note>
+    Use the voice cloning feature to create custom voices from audio samples.
+  </Note>
+</ParamField>
+
+<ParamField path="coquiSpeed" type="number" default="1.0">
+  Coqui speech rate multiplier
+  
+  - Range: `0.5` to `2.0`
+  - `1.0` = normal speed (default)
+  - Values work the same as Piper speed
+</ParamField>
+
+<ParamField path="coquiQuality" type="CoquiQuality" default="balanced">
+  Coqui voice quality preset
+  
+  - `fast` - Faster inference, good quality
+  - `balanced` - Balanced speed and quality (default)
+  - `high` - Best quality, slower inference
+</ParamField>
+
+<ParamField path="coquiEmotion" type="CoquiEmotion" default="neutral">
+  Coqui emotional tone
+  
+  Same options as Piper: `neutral`, `calm`, `happy`, `excited`, `serious`, `sad`
+</ParamField>
+
+<ParamField path="coquiUseGpu" type="boolean" default="false">
+  Enable GPU acceleration for Coqui
+  
+  Requires CUDA-compatible GPU and PyTorch with CUDA support.
+  
+  Benefits:
+  - 5-10x faster inference
+  - Lower CPU usage
+  - Enables real-time TTS for long responses
+</ParamField>
+
+<ParamField path="coquiSplitSentences" type="boolean" default="false">
+  Split text into sentences before synthesis
+  
+  When enabled, long responses are broken into sentences and synthesized separately for more natural pacing.
+</ParamField>
+
+## Voice Installation
+
+<Tabs>
+  <Tab title="Piper">
+    Piper voices are installed automatically:
+    
+    1. Open **Settings > TTS**
+    2. Select Piper as TTS engine
+    3. Click "Install Voice" (if not already installed)
+    4. SlasshyWispr downloads and configures the default voice
+    5. Test with "Preview Voice" button
+    
+    <Note>
+      Voice models are stored locally. No internet connection needed after installation.
+    </Note>
+  </Tab>
+  
+  <Tab title="Coqui">
+    Coqui requires manual Python setup:
+    
+    1. Install Python 3.8+ (if not already installed)
+    2. Install TTS library:
+       ```bash
+       pip install TTS
+       ```
+    3. Open **Settings > TTS**
+    4. Select Coqui as TTS engine
+    5. Point to Python executable path
+    6. SlasshyWispr validates the installation
+    7. Download a voice model:
+       ```bash
+       tts --list_models
+       tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "Test" --out_path test.wav
+       ```
+    
+    <Note>
+      First run downloads the model (may take several minutes).
+    </Note>
+  </Tab>
+</Tabs>
+
+## Voice Cloning (Coqui Only)
+
+Create custom voices from reference audio samples.
+
+### Requirements
+
+- Coqui TTS engine enabled
+- XTTS v2 or compatible cloning model
+- Clean audio sample (5-30 seconds recommended)
+- Single speaker, minimal background noise
+
+### Cloning Process
+
+1. Open **Settings > TTS > Coqui**
+2. Click "Clone Voice"
+3. Upload or record reference audio (max 30 seconds)
+4. Provide a speaker ID name
+5. SlasshyWispr processes the audio and creates a voice profile
+6. Test with "Preview Voice" button
+7. Select the cloned voice from the voice dropdown
+
+<Note>
+  Maximum reference audio length: **{MAX_COQUI_REFERENCE_SECONDS} seconds** (from `constants.ts:87`)
+</Note>
+
+### Best Practices for Voice Cloning
+
+- **Audio quality**: Use high-quality recordings (44.1kHz or higher)
+- **Duration**: 10-20 seconds is optimal
+- **Content**: Natural speech, varied intonation
+- **Environment**: Quiet room, no echo or reverb
+- **Speaker**: Single speaker only, consistent volume
+- **Emotion**: Neutral tone for most versatile results
+
+## Assistant Name
+
+<ParamField path="assistantName" type="string" default="Lily">
+  Display name for the assistant in conversations
+  
+  This appears in the home history and TTS announcements.
+</ParamField>
+
+## Troubleshooting
+
+<Accordion title="No audio playback">
+  1. Check system volume and output device
+  2. Verify TTS engine is properly installed
+  3. Test with "Preview Voice" in settings
+  4. Check SlasshyWispr audio permissions
+  5. Try switching to the other TTS engine
+</Accordion>
+
+<Accordion title="Coqui installation fails">
+  1. Verify Python version (3.8 or higher required)
+  2. Install TTS library: `pip install TTS`
+  3. Check Python path in settings
+  4. Look for error messages in SlasshyWispr logs
+  5. Try installing in a virtual environment
+</Accordion>
+
+<Accordion title="Voice sounds robotic or garbled">
+  1. Increase quality setting (Piper/Coqui quality)
+  2. Reduce speed multiplier
+  3. For Coqui: enable GPU acceleration if available
+  4. For cloning: use higher quality reference audio
+  5. Try a different voice model
+</Accordion>
+
+<Accordion title="TTS is too slow">
+  1. Lower quality setting to "fast"
+  2. For Coqui: enable GPU acceleration
+  3. Increase speed multiplier
+  4. Switch to Piper for fastest inference
+  5. Disable sentence splitting (Coqui)
+</Accordion>

@@ -1,0 +1,433 @@
+---
+title: Hardware Requirements
+description: System requirements and recommendations for running local models in SlasshyWispr
+---
+
+SlasshyWispr analyzes your hardware to recommend optimal local models for speech-to-text and AI inference.
+
+## Hardware Advisor
+
+SlasshyWispr includes an intelligent hardware advisor that analyzes your system and provides model recommendations.
+
+### What Gets Analyzed
+
+The hardware advisor collects:
+
+```typescript
+interface LocalSttHardwareAdviceResponse {
+  cpuName: string;                    // CPU model name
+  logicalCores: number;               // Number of logical CPU cores
+  totalRamGb: number;                 // Total system RAM in GB
+  nvidiaGpuDetected: boolean;         // NVIDIA GPU presence
+  gpuName: string;                    // GPU model name
+  gpuVramGb: number;                  // GPU VRAM in GB
+  performanceTier: string;            // Overall system tier
+  slasshySuggestionModel: string;     // Top recommended model
+  suggestedModels: string[];          // All recommended models
+  cautionModels: string[];            // Models that may struggle
+  selectedModelWarning: string;       // Warning for current selection
+  details: string;                    // Additional information
+}
+```
+
+<Info>
+  The hardware advisor runs automatically when you first access local model settings. Results are cached to avoid repeated system scans.
+</Info>
+
+## CPU Requirements
+
+### Minimum Requirements
+
+- **Processor**: Modern x86_64 or ARM64 CPU
+- **Cores**: 2 logical cores minimum
+- **Instruction Sets**: AVX support recommended for optimal performance
+
+### Recommended CPUs
+
+<CardGroup cols={2}>
+  <Card title="Entry Level" icon="microchip">
+    **4-6 cores**
+    
+    Intel Core i3/i5, AMD Ryzen 3/5, Apple M1
+    
+    Suitable for: Moonshine, SenseVoice, Whisper Small
+  </Card>
+  
+  <Card title="Mid Range" icon="microchip">
+    **6-8 cores**
+    
+    Intel Core i5/i7, AMD Ryzen 5/7, Apple M2/M3
+    
+    Suitable for: Parakeet, Whisper Medium, small Ollama models
+  </Card>
+  
+  <Card title="High End" icon="microchip">
+    **8+ cores**
+    
+    Intel Core i7/i9, AMD Ryzen 7/9, Apple M2/M3 Pro/Max
+    
+    Suitable for: All models, large Ollama models
+  </Card>
+</CardGroup>
+
+### CPU Performance Impact
+
+- **STT Transcription**: CPU-intensive for model inference
+- **Ollama Inference**: Benefits greatly from more cores
+- **Concurrent Operations**: Multiple cores enable simultaneous STT + AI
+
+<Note>
+  Apple Silicon Macs (M1/M2/M3) provide excellent performance due to unified memory architecture and Neural Engine acceleration.
+</Note>
+
+## RAM Requirements
+
+### Memory Guidelines
+
+RAM requirements depend on model sizes:
+
+| Total RAM | STT Models | Ollama Models |
+|-----------|------------|---------------|
+| 4 GB | Moonshine only | Not recommended |
+| 8 GB | Moonshine, SenseVoice, Whisper Small | 1B-3B models |
+| 16 GB | All small/medium models, Parakeet | 7B-8B models |
+| 32 GB | All models including Whisper Turbo | 13B-14B models |
+| 64+ GB | All models with headroom | 30B+ models |
+
+### RAM Usage Patterns
+
+<Steps>
+  <Step title="Base Application">
+    SlasshyWispr uses ~200-400 MB for the core application
+  </Step>
+  
+  <Step title="STT Model Loading">
+    Models consume RAM approximately equal to their file size:
+    - Moonshine: ~60 MB
+    - SenseVoice: ~160 MB
+    - Parakeet/Whisper Small/Medium: ~500 MB
+    - Whisper Large/Turbo: 1.1-1.6 GB
+  </Step>
+  
+  <Step title="Ollama Model Loading">
+    LLM models consume significant RAM:
+    - 1B-3B models: 2-4 GB
+    - 7B-8B models: 6-10 GB
+    - 13B-14B models: 12-18 GB
+    - 30B+ models: 25+ GB
+  </Step>
+  
+  <Step title="Operating System Reserve">
+    Keep 2-4 GB free for OS and other applications
+  </Step>
+</Steps>
+
+<Warning>
+  Insufficient RAM will cause severe performance degradation through swap/paging. Always choose models that fit comfortably within your available RAM.
+</Warning>
+
+## GPU Support
+
+### NVIDIA GPU Detection
+
+SlasshyWispr automatically detects NVIDIA GPUs and reports:
+- GPU model name
+- VRAM capacity
+- CUDA availability
+
+### GPU Acceleration Benefits
+
+<CardGroup cols={2}>
+  <Card title="STT Acceleration" icon="gauge-high">
+    NVIDIA GPUs can accelerate ONNX model inference
+    
+    **Speed improvement**: 2-5x faster transcription
+  </Card>
+  
+  <Card title="Ollama Acceleration" icon="rocket">
+    Ollama automatically uses GPU for LLM inference
+    
+    **Speed improvement**: 5-20x faster responses
+  </Card>
+</CardGroup>
+
+### Supported GPUs
+
+**NVIDIA (CUDA)**:
+- GTX 1000 series and newer
+- RTX 2000, 3000, 4000 series
+- Professional GPUs (Quadro, Tesla, A-series)
+- Requires: CUDA 11.x or newer
+
+**Apple (Metal)**:
+- M1, M2, M3 series (integrated GPU)
+- Metal acceleration automatic on macOS
+
+**AMD (ROCm)**:
+- Limited support via Ollama on Linux
+- Not supported for ONNX Runtime in SlasshyWispr
+
+### VRAM Requirements
+
+| VRAM | STT Models | Ollama Models |
+|------|------------|---------------|
+| 2-4 GB | Small models | 1B-3B models |
+| 6-8 GB | Medium models | 7B-8B models |
+| 12 GB | Large models | 13B-14B models |
+| 16+ GB | All models | 30B+ models |
+
+<Info>
+  If VRAM is insufficient, models will fall back to CPU/RAM. This is slower but still functional.
+</Info>
+
+## Performance Tiers
+
+Based on your hardware analysis, SlasshyWispr assigns a performance tier:
+
+### Tier 1: Entry Level
+
+**Hardware**:
+- 4-8 GB RAM
+- 2-4 CPU cores
+- No dedicated GPU
+
+**Recommended Models**:
+- STT: Moonshine Base, SenseVoice
+- AI: Ollama not recommended, use online mode
+
+**Use Case**: Basic dictation with cloud AI
+
+### Tier 2: Standard
+
+**Hardware**:
+- 8-16 GB RAM
+- 4-6 CPU cores
+- Optional: Entry-level GPU (2-4GB VRAM)
+
+**Recommended Models**:
+- STT: Parakeet v3, Whisper Small/Medium
+- AI: Ollama 1B-3B models (llama3.2:1b, mistral:3b)
+
+**Use Case**: Balanced offline performance
+
+### Tier 3: Performance
+
+**Hardware**:
+- 16-32 GB RAM
+- 6-8 CPU cores
+- Recommended: Mid-range GPU (6-8GB VRAM)
+
+**Recommended Models**:
+- STT: Whisper Medium, Parakeet v3, Whisper Turbo
+- AI: Ollama 7B-8B models (llama3.2, mistral, gemma2)
+
+**Use Case**: Fast offline AI with high accuracy
+
+### Tier 4: Enthusiast
+
+**Hardware**:
+- 32+ GB RAM
+- 8+ CPU cores
+- High-end GPU (12+ GB VRAM)
+
+**Recommended Models**:
+- STT: Any model, Whisper Turbo for best accuracy
+- AI: Ollama 13B-30B+ models (llama3.2:13b, mixtral)
+
+**Use Case**: Maximum quality offline experience
+
+<Info>
+  Your performance tier is calculated automatically and displayed in Settings > Offline along with customized model recommendations.
+</Info>
+
+## Model Recommendations Based on Hardware
+
+### Suggestion Algorithm
+
+SlasshyWispr recommends models based on:
+
+1. **Total RAM**: Must fit model + OS + headroom
+2. **CPU cores**: More cores = better performance with larger models
+3. **GPU presence**: Enables acceleration tier recommendations
+4. **VRAM**: Determines max GPU-accelerated model size
+
+### Suggested Models Array
+
+The `suggestedModels` array contains models that should work well on your system, ordered by recommendation priority.
+
+**Example** (16GB RAM, 8 cores, RTX 3060):
+```json
+{
+  "slasshySuggestionModel": "nvidia/parakeet-tdt-0.6b-v3",
+  "suggestedModels": [
+    "nvidia/parakeet-tdt-0.6b-v3",
+    "openai/whisper-medium",
+    "openai/whisper-small",
+    "FunAudioLLM/SenseVoiceSmall",
+    "UsefulSensors/moonshine-base"
+  ]
+}
+```
+
+### Caution Models Array
+
+The `cautionModels` array lists models that may struggle on your hardware:
+- May exceed available RAM
+- Could cause slow performance
+- Might require swap/paging
+
+**Example** (8GB RAM system):
+```json
+{
+  "cautionModels": [
+    "openai/whisper-large-v3-turbo",
+    "openai/whisper-large-v3"
+  ]
+}
+```
+
+<Warning>
+  You can still select caution models, but expect reduced performance. The `selectedModelWarning` field will explain potential issues.
+</Warning>
+
+### Selected Model Warning
+
+If you choose a model outside recommendations, `selectedModelWarning` provides specific guidance:
+
+- "This model may exceed available RAM"
+- "Consider a smaller model for better performance"
+- "GPU acceleration recommended for this model"
+- Empty string if selection is optimal
+
+## Checking Your Hardware
+
+<Steps>
+  <Step title="Open Settings">
+    Navigate to **Settings** > **Offline** in SlasshyWispr
+  </Step>
+  
+  <Step title="View Hardware Analysis">
+    Your hardware details are displayed:
+    - CPU model and core count
+    - Total RAM
+    - GPU detection status
+    - Performance tier
+  </Step>
+  
+  <Step title="Review Recommendations">
+    SlasshyWispr highlights:
+    - Top recommended model (green)
+    - Other suggested models
+    - Models to avoid (red/yellow warnings)
+  </Step>
+  
+  <Step title="Select Optimal Model">
+    Choose from suggested models for best performance
+  </Step>
+</Steps>
+
+## Optimizing Performance
+
+### For Low-Resource Systems
+
+<Steps>
+  <Step title="Choose Lightweight Models">
+    Use Moonshine or SenseVoice for STT
+  </Step>
+  
+  <Step title="Close Background Apps">
+    Free RAM by closing unnecessary applications
+  </Step>
+  
+  <Step title="Use Hybrid Mode">
+    Local STT + online AI for balanced resource usage
+  </Step>
+  
+  <Step title="Disable GPU Acceleration">
+    If GPU causes issues, force CPU-only mode
+  </Step>
+</Steps>
+
+### For High-Performance Systems
+
+<Steps>
+  <Step title="Enable GPU Acceleration">
+    Ensure NVIDIA drivers and CUDA toolkit are installed
+  </Step>
+  
+  <Step title="Use Larger Models">
+    Whisper Turbo for STT, 13B+ models for Ollama
+  </Step>
+  
+  <Step title="Keep Models Warm">
+    Enable daemon mode to keep models loaded in memory
+  </Step>
+  
+  <Step title="Monitor Latency">
+    Check pipeline latency in Settings > Pipeline
+  </Step>
+</Steps>
+
+## Storage Requirements
+
+### Disk Space Needed
+
+- **Application**: ~300 MB
+- **STT Models**: 58 MB - 1.6 GB per model
+- **Ollama Models**: 1 GB - 40+ GB per model
+- **Voice Models (Piper)**: ~10-50 MB per voice
+- **Cache & Logs**: ~100-500 MB
+
+**Total Estimate**: 5-50+ GB depending on models
+
+<Note>
+  Use SSD storage for best model loading performance. HDDs will work but may increase warmup times.
+</Note>
+
+## Troubleshooting Hardware Issues
+
+### GPU Not Detected
+
+**Issue**: NVIDIA GPU not showing in hardware advisor
+
+**Solutions**:
+- Install latest NVIDIA drivers
+- Install CUDA toolkit (11.x or 12.x)
+- Restart SlasshyWispr after driver installation
+- Check GPU visibility: `nvidia-smi` (Linux/Windows)
+
+### Insufficient RAM Warnings
+
+**Issue**: Cannot load model, out of memory errors
+
+**Solutions**:
+- Close other applications
+- Choose a smaller model
+- Increase system swap space (temporary solution)
+- Upgrade RAM for better experience
+
+### Slow Performance
+
+**Issue**: Models load but transcription/inference is slow
+
+**Solutions**:
+- Check if swap/paging is active (indicates RAM pressure)
+- Reduce model size
+- Enable GPU acceleration if available
+- Close background processes
+- Check CPU throttling (thermal issues)
+
+### Model Warmup Failures
+
+**Issue**: Model fails to warm up or load
+
+**Solutions**:
+- Verify sufficient disk space for model files
+- Check available RAM exceeds model size + 2GB
+- Review logs for specific errors
+- Try re-downloading the model
+- Update to latest SlasshyWispr version
+
+<Info>
+  The hardware advisor automatically refreshes recommendations when you install new RAM, upgrade GPU, or change system configuration.
+</Info>

@@ -1,0 +1,381 @@
+---
+title: Advanced Settings
+description: System prompts, temperature, style profiles, audio processing, and privacy settings
+---
+
+Configure advanced AI behavior, audio processing, language settings, and privacy controls.
+
+## AI Behavior
+
+### System Prompt
+
+<ParamField path="systemPrompt" type="string" default="You are SlasshyWispr, a helpful desktop voice assistant. Keep replies concise and easy to speak aloud.">
+  Custom system prompt for AI assistant
+  
+  This prompt sets the behavior, personality, and response style of the assistant. It's sent with every AI request.
+  
+  <Note>
+    Keep prompts concise and clear. The assistant is optimized for voice responses, so instruct it to be brief.
+  </Note>
+  
+  **Default prompt:**
+  ```
+  You are SlasshyWispr, a helpful desktop voice assistant. 
+  Keep replies concise and easy to speak aloud.
+  ```
+  
+  **Example custom prompts:**
+  
+  <Accordion title="Code Assistant">
+    ```
+    You are a coding assistant. Provide concise code examples 
+    and explanations. Keep responses under 3 sentences unless 
+    code is requested.
+    ```
+  </Accordion>
+  
+  <Accordion title="Writing Coach">
+    ```
+    You are a writing coach. Help improve clarity, grammar, 
+    and style. Be encouraging and constructive. Keep feedback 
+    brief and actionable.
+    ```
+  </Accordion>
+  
+  <Accordion title="Personal Assistant">
+    ```
+    You are a personal assistant named Lily. Be friendly, 
+    efficient, and proactive. Prioritize quick, helpful 
+    responses for daily tasks.
+    ```
+  </Accordion>
+</ParamField>
+
+### Model Parameters
+
+<ParamField path="temperature" type="number" default="0.35">
+  AI model temperature (creativity vs consistency)
+  
+  - Range: `0.0` to `2.0`
+  - `0.0` = Deterministic, consistent, focused
+  - `0.35` = Balanced (default)
+  - `1.0` = Creative, varied responses
+  - `2.0` = Highly creative, unpredictable
+  
+  <Note>
+    Lower temperatures (0.2-0.5) are recommended for dictation and factual tasks.
+    Higher temperatures (0.7-1.2) work better for creative writing.
+  </Note>
+</ParamField>
+
+<ParamField path="maxTokens" type="number" default="320">
+  Maximum tokens in AI response
+  
+  - Default: `320` (~240 words)
+  - Lower values = shorter, faster responses
+  - Higher values = longer, more detailed responses
+  
+  <Note>
+    Voice responses should be concise. 320 tokens is optimized for TTS playback length.
+  </Note>
+</ParamField>
+
+### Style Profiles
+
+<ParamField path="styleProfile" type="StyleProfile" default="adaptive">
+  Response style and tone preset
+  
+  - `adaptive` - Adjusts style based on context (default)
+  - `professional` - Formal, business-appropriate tone
+  - `casual` - Friendly, conversational tone
+  - `concise` - Ultra-brief, minimal responses
+  - `developer` - Technical, code-focused responses
+  
+  <Tabs>
+    <Tab title="Adaptive">
+      Dynamically adjusts tone based on:
+      - Time of day
+      - Query complexity
+      - Previous conversation context
+      
+      Best for general-purpose use.
+    </Tab>
+    
+    <Tab title="Professional">
+      - Formal language
+      - Structured responses
+      - Business terminology
+      - Minimal contractions
+      
+      Best for work environments.
+    </Tab>
+    
+    <Tab title="Casual">
+      - Conversational tone
+      - Contractions and colloquialisms
+      - Friendly personality
+      - Relatable examples
+      
+      Best for personal use.
+    </Tab>
+    
+    <Tab title="Concise">
+      - One-sentence responses when possible
+      - No elaboration unless asked
+      - Bullet points over paragraphs
+      - Direct answers only
+      
+      Best for quick lookups.
+    </Tab>
+    
+    <Tab title="Developer">
+      - Code-first explanations
+      - Technical jargon expected
+      - Syntax highlighting
+      - Implementation details
+      
+      Best for programming tasks.
+    </Tab>
+  </Tabs>
+</ParamField>
+
+## Language Settings
+
+<ParamField path="dictationLanguage" type="string" default="en">
+  Primary dictation language
+  
+  Supported languages:
+  - `en` - English
+  - `es` - Spanish
+  - `fr` - French
+  - `de` - German
+  - `it` - Italian
+  - `pt` - Portuguese
+  - `hi` - Hindi
+  - `bn` - Bengali
+  - `ja` - Japanese
+  - `ko` - Korean
+  - `zh` - Chinese
+  - `ar` - Arabic
+  - `ru` - Russian
+</ParamField>
+
+<ParamField path="dictationLanguageMode" type="DictationLanguageMode" default="single">
+  Language detection mode
+  
+  - `single` - Use one language for all dictation (default)
+  - `multiple` - Auto-detect from allowed languages
+  
+  <Note>
+    Multiple language mode requires `dictationLanguageAllowList` to be configured.
+  </Note>
+</ParamField>
+
+<ParamField path="dictationLanguageAllowList" type="string[]" default="[]">
+  Allowed languages for auto-detection
+  
+  When `dictationLanguageMode` is set to `multiple`, the STT model will detect and transcribe in any of these languages.
+  
+  Example:
+  ```json
+  ["en", "es", "fr"]
+  ```
+</ParamField>
+
+## Audio Processing
+
+<ParamField path="removeFillers" type="boolean" default="false">
+  Remove filler words from transcription
+  
+  Automatically removes:
+  - "um", "uh", "er"
+  - "like", "you know"
+  - Repeated words
+  - Hesitations
+  
+  <Note>
+    This improves transcript readability but may occasionally remove intentional words.
+  </Note>
+</ParamField>
+
+<ParamField path="autoPunctuation" type="boolean" default="false">
+  Automatically add punctuation to transcription
+  
+  The STT model infers punctuation from speech patterns:
+  - Periods at natural pauses
+  - Question marks for rising intonation
+  - Commas for breath breaks
+  
+  <Note>
+    Works best with online models. Local models may have limited punctuation support.
+  </Note>
+</ParamField>
+
+<ParamField path="numberedLists" type="boolean" default="false">
+  Convert spoken lists to numbered format
+  
+  When enabled:
+  - "First, second, third" → "1. 2. 3."
+  - "Item one, item two" → "1. 2."
+  
+  Useful for dictating structured content.
+</ParamField>
+
+<ParamField path="backtrackCorrection" type="boolean" default="false">
+  Enable voice correction commands
+  
+  Allows you to say:
+  - "Scratch that" - Remove last sentence
+  - "Undo" - Remove last word
+  - "Delete that" - Remove last phrase
+  
+  <Note>
+    Experimental feature. May occasionally trigger on similar-sounding phrases.
+  </Note>
+</ParamField>
+
+<ParamField path="dictationSoundEffects" type="boolean" default="false">
+  Play audio feedback during dictation
+  
+  - Start recording: chime
+  - Stop recording: click
+  - Processing: subtle tone
+  - Error: alert sound
+</ParamField>
+
+<ParamField path="muteMusicWhileDictating" type="boolean" default="false">
+  Automatically mute system audio during recording
+  
+  Prevents background music/audio from being picked up by the microphone.
+  
+  <Note>
+    Requires system audio control permissions.
+  </Note>
+</ParamField>
+
+## Privacy and Data
+
+<ParamField path="incognitoMode" type="boolean" default="false">
+  Disable history logging
+  
+  When enabled:
+  - No conversation history saved
+  - No transcripts stored locally
+  - Home history remains empty
+  - Usage stats not tracked
+  
+  <Note>
+    This does NOT affect data sent to online model providers. Use local mode for complete privacy.
+  </Note>
+</ParamField>
+
+<ParamField path="contextAwareness" type="boolean" default="false">
+  Enable multi-turn conversation context
+  
+  When enabled, the assistant remembers previous turns in the session for context-aware responses.
+  
+  <Note>
+    Context is stored in memory only and cleared when the app restarts (unless incognito mode is disabled).
+  </Note>
+</ParamField>
+
+## Workflow Settings
+
+<ParamField path="autoPasteDictation" type="boolean" default="false">
+  Automatically paste transcription into active app
+  
+  When enabled, transcribed text is immediately pasted at cursor position.
+  When disabled, text is copied to clipboard only.
+</ParamField>
+
+<ParamField path="copyToClipboard" type="boolean" default="false">
+  Copy assistant responses to clipboard
+  
+  Useful for saving AI responses without manual selection.
+</ParamField>
+
+<ParamField path="commandMode" type="boolean" default="false">
+  Enable command detection in dictation
+  
+  When enabled, spoken commands like "new line", "period", "comma" are converted to formatting.
+</ParamField>
+
+<ParamField path="wakeWordEnabled" type="boolean" default="false">
+  Enable wake word detection for hands-free assistant
+  
+  When enabled, say the wake phrase (e.g., "Hey Lily") to activate the assistant without pressing a hotkey.
+  
+  <Note>
+    Wake word detection runs continuously and may increase battery usage.
+  </Note>
+</ParamField>
+
+## Microphone
+
+<ParamField path="microphoneDeviceId" type="string" default="">
+  Selected microphone device ID
+  
+  Set in **Settings > General > Microphone**. SlasshyWispr lists all available input devices.
+  
+  Leave empty to use system default microphone.
+</ParamField>
+
+## UI and Appearance
+
+<ParamField path="themeMode" type="ThemeMode" default="system">
+  Application theme
+  
+  - `system` - Match OS theme (default)
+  - `light` - Always light mode
+  - `dark` - Always dark mode
+</ParamField>
+
+<ParamField path="showFlowBar" type="boolean" default="false">
+  Show live pipeline status bar during processing
+  
+  Displays real-time STT/AI/TTS latency and status.
+</ParamField>
+
+<ParamField path="showAppInDock" type="boolean" default="false">
+  Show SlasshyWispr icon in dock/taskbar
+  
+  When disabled, app runs in system tray only.
+</ParamField>
+
+<ParamField path="launchAtLogin" type="boolean" default="false">
+  Start SlasshyWispr automatically on system boot
+  
+  <Note>
+    May require OS permissions on first enable.
+  </Note>
+</ParamField>
+
+## Best Practices
+
+### For Privacy
+
+- Enable **incognito mode** to prevent local history
+- Use **local runtime mode** to keep data on-device
+- Disable **context awareness** to avoid multi-turn tracking
+- Disable **remember API key** to avoid persisting credentials
+
+### For Accuracy
+
+- Enable **auto punctuation** for better readability
+- Enable **remove fillers** for cleaner transcripts
+- Use **single language mode** unless multilingual dictation is needed
+- Set **temperature** to 0.2-0.4 for factual/dictation tasks
+
+### For Performance
+
+- Use **local STT** + **online AI** for balanced speed
+- Lower **max tokens** to 200-250 for faster responses
+- Enable **Piper TTS** instead of Coqui for fastest playback
+- Disable **wake word** when not needed to save battery
+
+### For Workflow
+
+- Enable **auto paste dictation** for seamless text entry
+- Enable **copy to clipboard** to save assistant responses
+- Use **concise style profile** for quick lookups
+- Customize **system prompt** to match your use case

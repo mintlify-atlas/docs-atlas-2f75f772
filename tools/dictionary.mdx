@@ -1,0 +1,134 @@
+---
+title: Dictionary
+description: Customize transcription with personal and team vocabulary terms
+---
+
+The dictionary feature allows you to define custom vocabulary terms that SlasshyWispr will recognize and transcribe correctly during dictation. This is particularly useful for technical jargon, proper nouns, brand names, or domain-specific terminology.
+
+## What is the Dictionary Feature
+
+The dictionary maps spoken words or phrases (source) to their written form (target). When you dictate, SlasshyWispr automatically replaces recognized source terms with their corresponding target text, ensuring accurate transcription of specialized vocabulary.
+
+<Info>
+Dictionary terms work in real-time during dictation and are applied before the text is inserted into your application.
+</Info>
+
+## DictionaryTerm Structure
+
+Each dictionary entry contains the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Unique identifier for the term |
+| `source` | string | The spoken word/phrase to recognize |
+| `target` | string | The text to insert when source is detected |
+| `scope` | "personal" \| "shared" | Whether the term is private or team-wide |
+| `createdAt` | number | Unix timestamp of when the term was created |
+
+<Note>
+Source terms are case-insensitive during recognition but preserve the exact casing you specify in the target field.
+</Note>
+
+## Adding Custom Terms
+
+<Steps>
+  <Step title="Open Dictionary">
+    Navigate to the Dictionary section from the main navigation
+  </Step>
+  
+  <Step title="Create New Term">
+    Click the "Add Term" button to open the entry form
+  </Step>
+  
+  <Step title="Enter Source and Target">
+    - **Source**: Enter the word or phrase as it sounds when spoken
+    - **Target**: Enter the exact text you want to appear in transcription
+  </Step>
+  
+  <Step title="Set Scope">
+    Choose whether this term should be:
+    - **Personal**: Only available to you
+    - **Shared**: Available to your entire team
+  </Step>
+  
+  <Step title="Save">
+    Click "Save" to add the term to your dictionary
+  </Step>
+</Steps>
+
+## Team vs Personal Scope
+
+<CardGroup cols={2}>
+  <Card title="Personal Scope" icon="user">
+    Terms are stored locally and only affect your own dictation sessions. Ideal for personal preferences, nicknames, or client-specific vocabulary.
+  </Card>
+  
+  <Card title="Shared Scope" icon="users">
+    Terms are synchronized across your team and apply to all members. Perfect for company terminology, product names, or standardized vocabulary.
+  </Card>
+</CardGroup>
+
+### When to Use Each Scope
+
+**Use Personal scope for:**
+- Client names specific to your projects
+- Personal shortcuts or abbreviations
+- Regional spelling preferences
+- Experimental terms you're testing
+
+**Use Shared scope for:**
+- Company product names
+- Industry-standard terminology
+- Team-wide acronyms
+- Brand names your organization uses frequently
+
+## Use Cases for Custom Vocabulary
+
+### Technical Terminology
+
+```plaintext
+Source: "react component"
+Target: "React Component"
+Scope: Shared
+```
+
+### Product Names
+
+```plaintext
+Source: "slashy whisper"
+Target: "SlasshyWispr"
+Scope: Shared
+```
+
+### Acronyms and Abbreviations
+
+```plaintext
+Source: "A P I"
+Target: "API"
+Scope: Shared
+```
+
+### Domain-Specific Jargon
+
+```plaintext
+Source: "kubernetes"
+Target: "Kubernetes"
+Scope: Personal
+```
+
+<Note>
+Dictionary terms are processed in the order they were created. If multiple terms could match, the first matching term will be applied.
+</Note>
+
+## Managing Dictionary Terms
+
+You can edit or delete existing terms at any time:
+
+- **Edit**: Click on any term to modify its source, target, or scope
+- **Delete**: Remove terms that are no longer needed
+- **Search**: Use the search bar to quickly find specific terms
+- **Filter**: Toggle between viewing personal, shared, or all terms
+
+## Storage
+
+Dictionary terms are stored using the key `slasshy-wispr-dictionary-v1` and persist across application restarts. Shared terms require team synchronization to be enabled in your settings.

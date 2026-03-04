@@ -1,0 +1,174 @@
+---
+title: Voice Dictation
+description: Fast voice-to-text transcription with hotkey activation and clipboard integration
+---
+
+# Voice Dictation
+
+SlasshyWispr's voice dictation feature converts your speech into clean, accurate text with minimal friction. Activate it with a hotkey, speak naturally, and get instant transcription.
+
+## How Voice Dictation Works
+
+Voice dictation is the primary mode for converting speech to text without AI processing:
+
+1. **Activate** using your configured hotkey (default: `Ctrl+Space`)
+2. **Record** your speech using single-tap or push-to-talk mode
+3. **Transcribe** audio through online or offline STT models
+4. **Output** text to clipboard or directly paste into your active application
+
+<Note>
+Voice dictation focuses on accurate transcription. For AI-powered responses and context-aware rewriting, use [Assistant Mode](/features/assistant-mode).
+</Note>
+
+## Capture Modes
+
+SlasshyWispr supports two capture modes for recording audio:
+
+<Tabs>
+  <Tab title="Push-to-Talk">
+    **Push-to-Talk** (default) requires you to hold down the hotkey while speaking.
+    
+    - Hold the hotkey to record
+    - Release to stop recording and process
+    - Maximum recording time: 45 seconds
+    - Ideal for precise control over recording duration
+    
+    ```typescript
+    type CaptureMode = "push-to-talk" | "single-tap";
+    const DEFAULT_CAPTURE_MODE: CaptureMode = "push-to-talk";
+    ```
+  </Tab>
+  
+  <Tab title="Single-Tap">
+    **Single-Tap** mode activates with a single keypress.
+    
+    - Press hotkey once to start recording
+    - Press again (or wait) to stop
+    - Allows hands-free operation
+    - Better for longer dictation sessions
+    
+    <Tip>
+    Configure your preferred capture mode in **Settings > General**.
+    </Tip>
+  </Tab>
+</Tabs>
+
+## Hotkey Activation
+
+Dictation is triggered via global hotkeys that work across all applications:
+
+| Hotkey | Default | Purpose |
+|--------|---------|--------|
+| **Dictation Hotkey** | `Ctrl+Space` | Activates voice dictation mode |
+| **Command Hotkey** | `Ctrl+Shift+Space` | Activates assistant mode |
+
+<Info>
+Hotkeys are fully customizable in **Settings > General**. You can configure modifier keys (Ctrl, Shift, Alt, Meta) and the trigger key.
+</Info>
+
+## Recording Workflow
+
+The dictation workflow follows these stages:
+
+```typescript
+type Stage = "idle" | "recording" | "processing" | "speaking" | "error";
+```
+
+### Workflow Steps
+
+1. **Idle** - Application is ready and listening for hotkey activation
+2. **Recording** - Microphone is active and capturing audio
+3. **Processing** - Audio is being transcribed via STT model
+4. **Complete** - Transcript is ready and delivered to clipboard/paste
+5. **Error** - If transcription fails, an error message is displayed
+
+<Note>
+Recordings are limited to **45 seconds** (`MAX_RECORDING_MS = 45_000`) to ensure responsive processing.
+</Note>
+
+## Clipboard Integration
+
+Transcribed text can be delivered via clipboard for flexible use:
+
+- **Copy to Clipboard** - Text is copied and ready to paste anywhere
+- **Auto-Paste** - Text is automatically pasted into the active application
+- **Manual Control** - Choose when and where to paste the transcription
+
+These options are controlled by the following settings:
+
+```typescript
+interface PersistedSettings {
+  autoPasteDictation: boolean;  // Auto-paste after dictation
+  copyToClipboard: boolean;     // Copy to clipboard
+  // ... other settings
+}
+```
+
+<Tip>
+Enable both **Copy to Clipboard** and **Auto-Paste** to get the best of both worlds: immediate pasting with a clipboard backup.
+</Tip>
+
+## Auto-Paste Option
+
+The auto-paste feature automatically inserts transcribed text into your active application:
+
+### How Auto-Paste Works
+
+1. You complete a dictation
+2. Text is transcribed via STT
+3. SlasshyWispr simulates keyboard input
+4. Text appears at your cursor position
+
+### Auto-Paste Settings
+
+- **Enabled** - Text is automatically pasted after transcription
+- **Disabled** - Text is only copied to clipboard (manual paste with `Ctrl+V`)
+
+<Info>
+Auto-paste is configured in **Settings > General** under the `autoPasteDictation` setting.
+</Info>
+
+### When to Use Manual vs Auto-Paste
+
+| Scenario | Recommended Setting |
+|----------|--------------------|
+| Writing in text editors | Auto-paste enabled |
+| Sensitive/password fields | Auto-paste disabled |
+| Reviewing before inserting | Auto-paste disabled |
+| Fast drafting workflow | Auto-paste enabled |
+
+## Text Enhancement Options
+
+SlasshyWispr includes intelligent text processing features:
+
+```typescript
+interface PersistedSettings {
+  backtrackCorrection: boolean;  // Smart error correction
+  removeFillers: boolean;        // Remove "um", "uh", etc.
+  autoPunctuation: boolean;      // Automatic punctuation
+  numberedLists: boolean;        // Format numbered lists
+}
+```
+
+- **Backtrack Correction** - Automatically fixes common speech recognition errors
+- **Remove Fillers** - Strips out verbal fillers like "um", "uh", "like"
+- **Auto Punctuation** - Adds periods, commas, and other punctuation intelligently
+- **Numbered Lists** - Formats spoken numbers into proper list structures
+
+<Tip>
+Enable **Remove Fillers** and **Auto Punctuation** for cleaner, more professional dictation output.
+</Tip>
+
+## Best Practices
+
+1. **Speak Clearly** - Natural pace with clear pronunciation works best
+2. **Minimize Background Noise** - Use a quality microphone in a quiet environment
+3. **Use Wake Words** - For assistant features, enable wake word detection
+4. **Choose the Right Mode** - Use dictation for transcription, assistant mode for AI responses
+5. **Configure Hotkeys** - Set hotkeys that don't conflict with other applications
+
+## Related Features
+
+- [Assistant Mode](/features/assistant-mode) - AI-powered responses and context awareness
+- [Runtime Modes](/features/runtime-modes) - Online, offline, and hybrid transcription
+- [Clipboard Workflow](/features/clipboard-workflow) - Advanced clipboard and paste options

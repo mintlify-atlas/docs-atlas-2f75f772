@@ -1,0 +1,218 @@
+---
+title: Quick Notes
+description: Capture and manage notes via voice dictation
+---
+
+Quick Notes is a built-in feature that allows you to capture thoughts, ideas, and reminders using voice dictation. Notes are stored locally and can be easily reviewed, edited, or exported for use in other applications.
+
+## Quick Notes Feature
+
+The Quick Notes feature transforms SlasshyWispr into a voice-powered note-taking tool. Simply dictate your thoughts, and they're automatically saved with timestamps for easy reference later.
+
+<Info>
+Quick Notes are perfect for capturing meeting highlights, brainstorming ideas, task lists, or any information you want to record hands-free.
+</Info>
+
+## QuickNoteEntry Structure
+
+Each note contains the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Unique identifier for the note |
+| `text` | string | The transcribed content of the note |
+| `createdAt` | number | Unix timestamp of when the note was created |
+
+<Note>
+Notes are stored in chronological order with the most recent notes appearing first.
+</Note>
+
+## Capturing Notes via Dictation
+
+<Steps>
+  <Step title="Navigate to Notes">
+    Open the Notes section from the main navigation in SlasshyWispr
+  </Step>
+  
+  <Step title="Start New Note">
+    Click the "New Note" button or use the designated hotkey to begin recording
+  </Step>
+  
+  <Step title="Dictate Your Note">
+    Speak naturally to capture your thoughts. SlasshyWispr will transcribe in real-time:
+    - Meeting notes and action items
+    - Ideas and brainstorming
+    - Quick reminders
+    - Task lists
+    - Research findings
+  </Step>
+  
+  <Step title="Save Automatically">
+    Notes are saved automatically when you finish dictating. Each note includes a timestamp for easy reference.
+  </Step>
+</Steps>
+
+## Managing Notes
+
+The Notes interface provides several tools for organizing and working with your captured content:
+
+### Viewing Notes
+
+- **Timeline View**: See all notes in chronological order
+- **Timestamps**: Each note displays when it was created
+- **Search**: Quickly find notes by searching their content
+- **Scroll**: Navigate through your note history
+
+### Editing Notes
+
+<Steps>
+  <Step title="Select Note">
+    Click on any note to open it for editing
+  </Step>
+  
+  <Step title="Make Changes">
+    You can:
+    - Edit the text directly
+    - Add additional content
+    - Fix transcription errors
+    - Format the content
+  </Step>
+  
+  <Step title="Save Changes">
+    Changes are saved automatically or by clicking the save button
+  </Step>
+</Steps>
+
+### Deleting Notes
+
+Remove notes you no longer need:
+
+1. Select the note you want to delete
+2. Click the delete button or use the context menu
+3. Confirm the deletion
+
+<Note>
+Deleted notes cannot be recovered. Consider exporting important notes before deletion.
+</Note>
+
+## Export and Usage
+
+Quick Notes offers flexible export options to integrate with your workflow:
+
+### Export Options
+
+<CardGroup cols={2}>
+  <Card title="Copy to Clipboard" icon="clipboard">
+    Quickly copy any note to your clipboard for pasting into other applications
+  </Card>
+  
+  <Card title="Export to File" icon="file">
+    Save individual notes or your entire note collection as text files
+  </Card>
+</CardGroup>
+
+### Export Formats
+
+- **Plain Text (.txt)**: Simple text format compatible with any text editor
+- **Markdown (.md)**: Formatted text with support for headings, lists, and emphasis
+- **Bulk Export**: Export multiple notes at once with timestamps preserved
+
+### Integration Workflows
+
+**Meeting Notes to Task Manager:**
+1. Capture meeting notes via dictation
+2. Review and edit in Quick Notes
+3. Copy action items to clipboard
+4. Paste into your task management tool
+
+**Research to Documentation:**
+1. Dictate research findings as Quick Notes
+2. Export notes to markdown files
+3. Organize and expand into full documentation
+
+**Brainstorming to Project Plan:**
+1. Capture ideas during brainstorming sessions
+2. Review all notes in timeline view
+3. Export selected notes for team review
+4. Develop into actionable project plans
+
+## Common Use Cases
+
+### Meeting Notes
+
+Capture key points, decisions, and action items during meetings:
+
+```plaintext
+"Team sync meeting. Discussed Q1 roadmap. 
+John will lead the API redesign. 
+Sarah needs design mockups by Friday. 
+Next meeting scheduled for March 15th."
+```
+
+### Task Lists
+
+Create voice-activated to-do lists:
+
+```plaintext
+"Tasks for today: 
+Review pull requests. 
+Update documentation. 
+Schedule one-on-one with Alex. 
+Prepare demo for client call."
+```
+
+### Ideas and Brainstorming
+
+Capture creative ideas as they come:
+
+```plaintext
+"New feature idea: Add voice commands for navigation. 
+Could reduce keyboard usage by 40%. 
+Check if API supports custom wake words. 
+Research competitor implementations."
+```
+
+### Quick Reminders
+
+Store important reminders and follow-ups:
+
+```plaintext
+"Remember to follow up with customer support about 
+ticket 1234. Client mentioned performance issues 
+on mobile devices."
+```
+
+## Best Practices
+
+<Note>
+**Use Clear Dictation**: Speak clearly and at a moderate pace for best transcription accuracy.
+</Note>
+
+<Note>
+**Review and Edit**: After dictating, quickly review notes to correct any transcription errors while the context is fresh.
+</Note>
+
+<Note>
+**Regular Export**: Periodically export important notes to ensure they're backed up outside of SlasshyWispr.
+</Note>
+
+<Note>
+**Organize by Topic**: Consider using prefixes or tags at the start of notes to categorize them (e.g., "MEETING:", "IDEA:", "TODO:").
+</Note>
+
+## Storage
+
+Quick Notes are stored locally using the key `slasshy-wispr-notes-v1` and persist across application restarts. Your notes remain private and are stored on your device.
+
+<Info>
+Unlike dictionary terms and snippets, Quick Notes do not have a team/shared scope. All notes are personal and stored locally.
+</Info>
+
+## Privacy
+
+All Quick Notes are:
+- Stored locally on your device
+- Never uploaded to cloud servers
+- Encrypted with your system's security
+- Accessible only to you
+- Completely private and confidential

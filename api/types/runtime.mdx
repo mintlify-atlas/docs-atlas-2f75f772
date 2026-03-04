@@ -1,0 +1,473 @@
+---
+title: "Runtime Types"
+description: "Core runtime configuration types and interfaces for SlasshyWispr"
+---
+
+## Type Definitions
+
+### RuntimeMode
+
+```typescript
+type RuntimeMode = "online" | "local";
+```
+
+Defines the execution mode for speech-to-text and AI models.
+
+<ResponseField name="online" type="string">
+  Uses cloud-based API services for processing
+</ResponseField>
+
+<ResponseField name="local" type="string">
+  Uses locally installed models (Ollama, local STT)
+</ResponseField>
+
+---
+
+### CaptureMode
+
+```typescript
+type CaptureMode = "single-tap" | "push-to-talk";
+```
+
+Defines how audio input is captured from the user.
+
+<ResponseField name="single-tap" type="string">
+  Record starts and stops automatically
+</ResponseField>
+
+<ResponseField name="push-to-talk" type="string">
+  Hold key/button to record, release to stop
+</ResponseField>
+
+---
+
+### TtsEngine
+
+```typescript
+type TtsEngine = "piper" | "coqui";
+```
+
+Specifies which text-to-speech engine to use.
+
+<ResponseField name="piper" type="string">
+  Fast, lightweight TTS engine (default)
+</ResponseField>
+
+<ResponseField name="coqui" type="string">
+  High-quality TTS with voice cloning (requires Python)
+</ResponseField>
+
+---
+
+### StyleProfile
+
+```typescript
+type StyleProfile = "adaptive" | "professional" | "casual" | "concise" | "developer";
+```
+
+Controls the response style of the AI assistant.
+
+<ResponseField name="adaptive" type="string">
+  Adjusts tone based on context
+</ResponseField>
+
+<ResponseField name="professional" type="string">
+  Formal, business-appropriate responses
+</ResponseField>
+
+<ResponseField name="casual" type="string">
+  Friendly, conversational tone
+</ResponseField>
+
+<ResponseField name="concise" type="string">
+  Brief, to-the-point answers
+</ResponseField>
+
+<ResponseField name="developer" type="string">
+  Technical, code-focused responses
+</ResponseField>
+
+---
+
+### ThemeMode
+
+```typescript
+type ThemeMode = "system" | "light" | "dark";
+```
+
+Determines the application's visual theme.
+
+<ResponseField name="system" type="string">
+  Follow system preference
+</ResponseField>
+
+<ResponseField name="light" type="string">
+  Force light theme
+</ResponseField>
+
+<ResponseField name="dark" type="string">
+  Force dark theme
+</ResponseField>
+
+---
+
+### DictationLanguageMode
+
+```typescript
+type DictationLanguageMode = "single" | "multiple";
+```
+
+Controls language support for dictation.
+
+<ResponseField name="single" type="string">
+  Use one primary language
+</ResponseField>
+
+<ResponseField name="multiple" type="string">
+  Support multiple languages from allow list
+</ResponseField>
+
+---
+
+### Stage
+
+```typescript
+type Stage = "idle" | "recording" | "processing" | "speaking" | "error";
+```
+
+Represents the current state of the assistant pipeline.
+
+<ResponseField name="idle" type="string">
+  Waiting for user input
+</ResponseField>
+
+<ResponseField name="recording" type="string">
+  Actively capturing audio
+</ResponseField>
+
+<ResponseField name="processing" type="string">
+  Transcribing and generating response
+</ResponseField>
+
+<ResponseField name="speaking" type="string">
+  Playing TTS audio output
+</ResponseField>
+
+<ResponseField name="error" type="string">
+  An error occurred in the pipeline
+</ResponseField>
+
+---
+
+## Interfaces
+
+### HotkeySpec
+
+```typescript
+interface HotkeySpec {
+  ctrl: boolean;
+  shift: boolean;
+  alt: boolean;
+  meta: boolean;
+  key: string;
+  label: string;
+}
+```
+
+Defines a keyboard shortcut specification.
+
+<ResponseField name="ctrl" type="boolean">
+  Whether Ctrl/Control key is pressed
+</ResponseField>
+
+<ResponseField name="shift" type="boolean">
+  Whether Shift key is pressed
+</ResponseField>
+
+<ResponseField name="alt" type="boolean">
+  Whether Alt/Option key is pressed
+</ResponseField>
+
+<ResponseField name="meta" type="boolean">
+  Whether Meta/Command/Windows key is pressed
+</ResponseField>
+
+<ResponseField name="key" type="string">
+  The primary key (e.g., "Space", "A")
+</ResponseField>
+
+<ResponseField name="label" type="string">
+  Human-readable representation (e.g., "Ctrl+Space")
+</ResponseField>
+
+---
+
+### PersistedSettings
+
+```typescript
+interface PersistedSettings {
+  // API Configuration
+  apiKey: string;
+  apiBaseUrl: string;
+  sttModelName: string;
+  aiModelName: string;
+  rememberApiKey: boolean;
+  
+  // Runtime Modes
+  runtimeMode: RuntimeMode;
+  sttRuntimeMode: RuntimeMode;
+  aiRuntimeMode: RuntimeMode;
+  
+  // Local Configuration
+  localOllamaBaseUrl: string;
+  localOllamaModel: string;
+  localSttModel: string;
+  
+  // Input & Capture
+  captureMode: CaptureMode;
+  microphoneDeviceId: string;
+  pushToTalkHotkey: string;
+  commandHotkey: string;
+  
+  // Dictation
+  dictationLanguage: string;
+  dictationLanguageMode: DictationLanguageMode;
+  dictationLanguageAllowList: string[];
+  autoPasteDictation: boolean;
+  dictationSoundEffects: boolean;
+  muteMusicWhileDictating: boolean;
+  
+  // Assistant Behavior
+  styleProfile: StyleProfile;
+  systemPrompt: string;
+  temperature: number;
+  maxTokens: number;
+  commandMode: boolean;
+  wakeWordEnabled: boolean;
+  assistantName: string;
+  contextAwareness: boolean;
+  copyToClipboard: boolean;
+  incognitoMode: boolean;
+  
+  // Text Processing
+  backtrackCorrection: boolean;
+  removeFillers: boolean;
+  autoPunctuation: boolean;
+  numberedLists: boolean;
+  
+  // TTS Configuration (Piper)
+  ttsEngine: TtsEngine;
+  piperPath: string;
+  piperSpeed: number;
+  piperQuality: PiperQuality;
+  piperEmotion: PiperEmotion;
+  
+  // TTS Configuration (Coqui)
+  coquiPythonPath: string;
+  coquiModelName: string;
+  coquiLanguage: string;
+  coquiVoiceId: string;
+  coquiSpeed: number;
+  coquiQuality: CoquiQuality;
+  coquiEmotion: CoquiEmotion;
+  coquiUseGpu: boolean;
+  coquiSplitSentences: boolean;
+  
+  // UI & Display
+  launchAtLogin: boolean;
+  showFlowBar: boolean;
+  showAppInDock: boolean;
+  themeMode: ThemeMode;
+}
+```
+
+Complete application settings stored in local storage.
+
+<Expandable title="API Configuration">
+  <ResponseField name="apiKey" type="string">
+    API key for cloud services
+  </ResponseField>
+  <ResponseField name="apiBaseUrl" type="string">
+    Base URL for API endpoints
+  </ResponseField>
+  <ResponseField name="sttModelName" type="string">
+    Speech-to-text model identifier
+  </ResponseField>
+  <ResponseField name="aiModelName" type="string">
+    AI language model identifier
+  </ResponseField>
+  <ResponseField name="rememberApiKey" type="boolean">
+    Whether to persist API key between sessions
+  </ResponseField>
+</Expandable>
+
+<Expandable title="Runtime Modes">
+  <ResponseField name="runtimeMode" type="RuntimeMode">
+    Overall runtime mode (online/local)
+  </ResponseField>
+  <ResponseField name="sttRuntimeMode" type="RuntimeMode">
+    Speech-to-text runtime mode
+  </ResponseField>
+  <ResponseField name="aiRuntimeMode" type="RuntimeMode">
+    AI model runtime mode
+  </ResponseField>
+</Expandable>
+
+<Expandable title="Local Configuration">
+  <ResponseField name="localOllamaBaseUrl" type="string">
+    Ollama server URL (default: http://127.0.0.1:11434)
+  </ResponseField>
+  <ResponseField name="localOllamaModel" type="string">
+    Local Ollama model name
+  </ResponseField>
+  <ResponseField name="localSttModel" type="string">
+    Local STT model identifier
+  </ResponseField>
+</Expandable>
+
+<Expandable title="Input & Capture">
+  <ResponseField name="captureMode" type="CaptureMode">
+    Audio capture mode
+  </ResponseField>
+  <ResponseField name="microphoneDeviceId" type="string">
+    Selected microphone device ID
+  </ResponseField>
+  <ResponseField name="pushToTalkHotkey" type="string">
+    Hotkey for push-to-talk activation
+  </ResponseField>
+  <ResponseField name="commandHotkey" type="string">
+    Hotkey for command mode
+  </ResponseField>
+</Expandable>
+
+<Expandable title="Dictation Settings">
+  <ResponseField name="dictationLanguage" type="string">
+    Primary dictation language code
+  </ResponseField>
+  <ResponseField name="dictationLanguageMode" type="DictationLanguageMode">
+    Single or multiple language support
+  </ResponseField>
+  <ResponseField name="dictationLanguageAllowList" type="string[]">
+    Allowed language codes for multi-language mode
+  </ResponseField>
+  <ResponseField name="autoPasteDictation" type="boolean">
+    Automatically paste transcribed text
+  </ResponseField>
+  <ResponseField name="dictationSoundEffects" type="boolean">
+    Enable audio feedback during dictation
+  </ResponseField>
+  <ResponseField name="muteMusicWhileDictating" type="boolean">
+    Pause music playback during dictation
+  </ResponseField>
+</Expandable>
+
+<Expandable title="Assistant Behavior">
+  <ResponseField name="styleProfile" type="StyleProfile">
+    Response style profile
+  </ResponseField>
+  <ResponseField name="systemPrompt" type="string">
+    Custom system prompt for AI
+  </ResponseField>
+  <ResponseField name="temperature" type="number">
+    AI temperature parameter (0-2)
+  </ResponseField>
+  <ResponseField name="maxTokens" type="number">
+    Maximum tokens in AI response
+  </ResponseField>
+  <ResponseField name="commandMode" type="boolean">
+    Enable command mode functionality
+  </ResponseField>
+  <ResponseField name="wakeWordEnabled" type="boolean">
+    Enable wake word detection
+  </ResponseField>
+  <ResponseField name="assistantName" type="string">
+    Name of the assistant
+  </ResponseField>
+  <ResponseField name="contextAwareness" type="boolean">
+    Use screen/selection context in responses
+  </ResponseField>
+  <ResponseField name="copyToClipboard" type="boolean">
+    Copy responses to clipboard
+  </ResponseField>
+  <ResponseField name="incognitoMode" type="boolean">
+    Disable conversation history
+  </ResponseField>
+</Expandable>
+
+<Expandable title="Text Processing">
+  <ResponseField name="backtrackCorrection" type="boolean">
+    Enable voice backtrack correction
+  </ResponseField>
+  <ResponseField name="removeFillers" type="boolean">
+    Remove filler words (um, uh, etc.)
+  </ResponseField>
+  <ResponseField name="autoPunctuation" type="boolean">
+    Automatically add punctuation
+  </ResponseField>
+  <ResponseField name="numberedLists" type="boolean">
+    Convert spoken numbers to formatted lists
+  </ResponseField>
+</Expandable>
+
+<Expandable title="TTS - Piper">
+  <ResponseField name="ttsEngine" type="TtsEngine">
+    Selected TTS engine
+  </ResponseField>
+  <ResponseField name="piperPath" type="string">
+    Path to Piper executable
+  </ResponseField>
+  <ResponseField name="piperSpeed" type="number">
+    Playback speed multiplier
+  </ResponseField>
+  <ResponseField name="piperQuality" type="PiperQuality">
+    Audio quality (fast/balanced/high)
+  </ResponseField>
+  <ResponseField name="piperEmotion" type="PiperEmotion">
+    Voice emotion/tone
+  </ResponseField>
+</Expandable>
+
+<Expandable title="TTS - Coqui">
+  <ResponseField name="coquiPythonPath" type="string">
+    Path to Python with Coqui TTS
+  </ResponseField>
+  <ResponseField name="coquiModelName" type="string">
+    Coqui TTS model name
+  </ResponseField>
+  <ResponseField name="coquiLanguage" type="string">
+    Language code for Coqui
+  </ResponseField>
+  <ResponseField name="coquiVoiceId" type="string">
+    Voice/speaker identifier
+  </ResponseField>
+  <ResponseField name="coquiSpeed" type="number">
+    Playback speed multiplier
+  </ResponseField>
+  <ResponseField name="coquiQuality" type="CoquiQuality">
+    Audio quality (fast/balanced/high)
+  </ResponseField>
+  <ResponseField name="coquiEmotion" type="CoquiEmotion">
+    Voice emotion/tone
+  </ResponseField>
+  <ResponseField name="coquiUseGpu" type="boolean">
+    Enable GPU acceleration
+  </ResponseField>
+  <ResponseField name="coquiSplitSentences" type="boolean">
+    Process text sentence-by-sentence
+  </ResponseField>
+</Expandable>
+
+<Expandable title="UI & Display">
+  <ResponseField name="launchAtLogin" type="boolean">
+    Start app when user logs in
+  </ResponseField>
+  <ResponseField name="showFlowBar" type="boolean">
+    Display floating status bar
+  </ResponseField>
+  <ResponseField name="showAppInDock" type="boolean">
+    Show app icon in dock/taskbar
+  </ResponseField>
+  <ResponseField name="themeMode" type="ThemeMode">
+    Visual theme setting
+  </ResponseField>
+</Expandable>

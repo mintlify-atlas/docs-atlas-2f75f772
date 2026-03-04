@@ -1,0 +1,282 @@
+---
+title: Wake Word Setup
+description: Configure wake word activation to use SlasshyWispr hands-free with voice commands like "Hey Lily".
+---
+
+## Wake Word Feature
+
+Wake word detection allows you to activate SlasshyWispr's assistant mode using a voice phrase instead of pressing a hotkey. Simply say your wake phrase (like "Hey Lily") to start a conversation with your voice assistant.
+
+This feature enables:
+- Hands-free assistant activation
+- Natural conversation flow
+- Quick access while typing or working
+- Always-listening assistant mode when enabled
+
+<Note>
+  Wake word detection is part of SlasshyWispr's command mode and assistant features. When enabled, the app listens for your wake phrase in the background.
+</Note>
+
+## Configuration Settings
+
+Wake word functionality is controlled by two key settings:
+
+### Wake Word Enabled
+
+**Setting**: `wakeWordEnabled` (boolean)
+
+**Default**: `false` (disabled)
+
+Enables or disables wake word detection. When turned on, SlasshyWispr listens for your wake phrase and automatically enters assistant mode when detected.
+
+<Steps>
+  <Step title="Open General Settings">
+    Navigate to **Settings > General** in SlasshyWispr.
+  </Step>
+  
+  <Step title="Enable Wake Word">
+    Toggle the **Wake Word Enabled** option to turn on wake word detection.
+  </Step>
+  
+  <Step title="Test Activation">
+    Say your wake phrase (e.g., "Hey Lily") to test the activation.
+  </Step>
+</Steps>
+
+### Assistant Name
+
+**Setting**: `assistantName` (string)
+
+**Default**: `"Lily"`
+
+The name your assistant responds to. This forms the wake phrase pattern (e.g., "Hey Lily", "OK Lily").
+
+<Steps>
+  <Step title="Choose a Name">
+    Pick a distinctive name that's easy to pronounce and unlikely to trigger accidentally. The default is "Lily".
+  </Step>
+  
+  <Step title="Update Assistant Name">
+    In **Settings > General**, change the **Assistant Name** field to your preferred name.
+  </Step>
+  
+  <Step title="Use Natural Phrases">
+    Your wake phrase typically follows patterns like:
+    - "Hey [Name]"
+    - "OK [Name]"
+    - "[Name]"
+  </Step>
+</Steps>
+
+## How Wake Word Detection Works
+
+When wake word detection is enabled, SlasshyWispr:
+
+<Steps>
+  <Step title="Background Listening">
+    Continuously listens to your microphone in the background for the wake phrase.
+  </Step>
+  
+  <Step title="Wake Phrase Recognition">
+    When it detects a phrase matching your wake word pattern ("Hey [AssistantName]"), it activates.
+  </Step>
+  
+  <Step title="Assistant Mode Activation">
+    Automatically switches to assistant mode and begins recording your command or question.
+  </Step>
+  
+  <Step title="Processing & Response">
+    Processes your speech, generates an AI response, and speaks the answer using TTS (text-to-speech).
+  </Step>
+</Steps>
+
+<Warning>
+  Wake word detection requires continuous microphone access. Ensure your microphone is properly configured in **Settings > General** and that SlasshyWispr has necessary permissions.
+</Warning>
+
+## Customizing Wake Phrases
+
+While SlasshyWispr uses your configured `assistantName`, you can optimize your wake phrase experience:
+
+### Choosing an Effective Name
+
+<Accordion title="Use Distinctive Names">
+  Choose names with 2-3 syllables that are phonetically distinct. Names like "Lily", "Jarvis", "Atlas" work well.
+  
+  **Good examples**: Lily, Jarvis, Atlas, Nova, Echo
+  
+  **Avoid**: Common words, single syllables, names that sound like common phrases
+</Accordion>
+
+<Accordion title="Avoid Common Words">
+  Don't use names that sound like words you frequently say ("Hey", "OK", common names of people around you).
+  
+  This reduces false activations during normal conversation.
+</Accordion>
+
+<Accordion title="Test in Your Environment">
+  Test your chosen name in your actual working environment. Say it in different tones and volumes to ensure consistent detection.
+</Accordion>
+
+### Wake Phrase Patterns
+
+SlasshyWispr recognizes wake phrases that include your assistant name. Common patterns:
+
+- **"Hey [Name]"**: Most natural and commonly used (e.g., "Hey Lily")
+- **"OK [Name]"**: Alternative activation phrase (e.g., "OK Lily")
+- **"[Name]"**: Direct name call may work depending on implementation
+
+<Tip>
+  Speak clearly and at normal volume. Shouting or whispering may reduce detection accuracy.
+</Tip>
+
+## Tips for Reliable Activation
+
+### Microphone Setup
+
+<Steps>
+  <Step title="Select Quality Microphone">
+    Use a good quality microphone for best detection. USB microphones or headset mics typically work better than built-in laptop mics.
+  </Step>
+  
+  <Step title="Check Microphone Settings">
+    In **Settings > General**, verify the correct microphone device is selected under **Microphone Device**.
+  </Step>
+  
+  <Step title="Test Audio Levels">
+    Ensure your microphone picks up your voice clearly without distortion or excessive background noise.
+  </Step>
+</Steps>
+
+### Environment Optimization
+
+<Note>
+  **Reduce Background Noise**: Wake word detection works best in quiet environments. Reduce background music, conversations, or ambient noise when possible.
+</Note>
+
+<Accordion title="Optimal Speaking Distance">
+  Maintain a consistent distance from your microphone. For desktop mics, 6-12 inches typically works well.
+</Accordion>
+
+<Accordion title="Clear Pronunciation">
+  Speak the wake phrase clearly and naturally. Don't rush or mumble the assistant name.
+</Accordion>
+
+<Accordion title="Pause After Wake Word">
+  After saying the wake phrase, pause briefly (about 1 second) before stating your command or question. This gives the system time to fully activate.
+</Accordion>
+
+### Troubleshooting Detection Issues
+
+<Accordion title="False Activations">
+  **Problem**: Assistant activates when you don't want it to.
+  
+  **Solutions**:
+  - Choose a more distinctive assistant name
+  - Reduce microphone sensitivity if your OS/hardware allows
+  - Disable wake word when not needed
+  - Check for background audio (TV, music) that might contain similar sounds
+</Accordion>
+
+<Accordion title="Missed Activations">
+  **Problem**: Wake word doesn't trigger when you say it.
+  
+  **Solutions**:
+  - Speak louder and more clearly
+  - Check microphone is selected correctly in settings
+  - Test microphone in system settings to ensure it's working
+  - Verify wake word is enabled (`wakeWordEnabled: true`)
+  - Try different wake phrase patterns ("Hey Lily" vs "OK Lily")
+</Accordion>
+
+<Accordion title="Delayed Response">
+  **Problem**: Long delay between wake word and activation.
+  
+  **Solutions**:
+  - Check CPU usage - background processes may slow detection
+  - Ensure local STT models are warmed up if using offline mode
+  - Close unnecessary applications to free system resources
+</Accordion>
+
+## Command Mode vs Wake Word
+
+SlasshyWispr offers multiple ways to activate assistant mode:
+
+| Method | Activation | Use Case |
+|--------|------------|----------|
+| **Wake Word** | Voice phrase ("Hey Lily") | Hands-free, always available |
+| **Command Hotkey** | Keyboard shortcut (default: `Ctrl+Shift+Space`) | Quick activation while typing |
+| **Push-to-Talk** | Hold hotkey (default: `Ctrl+Space`) | Precise control of recording |
+
+<Tip>
+  You can use wake word and hotkeys together! Enable wake word for hands-free access, but still use hotkeys when you prefer keyboard control.
+</Tip>
+
+### When to Use Wake Word
+
+- During hands-free work (cooking, exercising, away from keyboard)
+- While typing or using the mouse
+- For quick queries without interrupting workflow
+- When you want natural, conversational assistant access
+
+### When to Use Hotkeys Instead
+
+- In noisy environments where wake word detection is unreliable
+- When you need precise control over recording start/stop
+- During meetings or calls (to avoid accidental activation)
+- When wake word false positives are problematic
+
+## Privacy Considerations
+
+<Warning>
+  **Microphone Access**: When wake word detection is enabled, SlasshyWispr requires continuous access to your microphone to listen for the wake phrase. 
+  
+  If you're concerned about always-on listening:
+  - Use hotkeys instead of wake word
+  - Disable wake word when not needed
+  - Check that you're using local STT models if you want processing to stay on-device
+</Warning>
+
+<Note>
+  **Local Processing**: If you're using local STT models (offline mode), wake word detection happens entirely on your device with no data sent to external servers.
+</Note>
+
+## Example Configuration
+
+### Full Wake Word Setup
+
+```json
+{
+  "wakeWordEnabled": true,
+  "assistantName": "Lily",
+  "commandMode": true,
+  "microphoneDeviceId": "default",
+  "sttRuntimeMode": "local",
+  "localSttModel": "nvidia/parakeet-tdt-0.6b-v3"
+}
+```
+
+**This configuration**:
+- Enables wake word detection
+- Sets assistant name to "Lily" (say "Hey Lily" to activate)
+- Uses local STT for privacy
+- Keeps command mode enabled for assistant features
+
+### Alternative: Hotkey-Only Setup
+
+```json
+{
+  "wakeWordEnabled": false,
+  "commandHotkey": "Ctrl+Shift+Space",
+  "pushToTalkHotkey": "Ctrl+Space"
+}
+```
+
+**This configuration**:
+- Disables wake word
+- Uses keyboard shortcuts only
+- No continuous microphone listening
+
+<Tip>
+  Start with wake word disabled, learn the hotkeys, then enable wake word once you're comfortable with the assistant features.
+</Tip>

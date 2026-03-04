@@ -1,0 +1,429 @@
+---
+title: 'Architecture Details'
+description: 'Deep dive into SlasshyWispr application structure, component design, and processing pipeline'
+---
+
+## Application Structure
+
+SlasshyWispr follows a **hybrid architecture** pattern with clear separation between UI layer (TypeScript) and system layer (Rust):
+
+```
+SlasshyWispr Application
+├── Frontend (TypeScript/Vite)
+│   ├── UI Components
+│   ├── State Management
+│   └── Tauri API Bindings
+└── Backend (Rust)
+    ├── Tauri Commands
+    ├── AppState Management
+    ├── Pipeline Processors
+    │   ├── STT Engine
+    │   ├── AI Integration
+    │   └── TTS Engine
+    └── Local Model Daemons
+```
+
+## Rust Backend Components
+
+### AppState Structure
+
+The central state container managing all runtime data:
+
+```rust
+struct AppState {
+    // Shared HTTP client with connection pooling
+    http: Client,
+    
+    // Text rewrite workflow state
+    pending_selection_rewrite: Mutex<Option<PendingSelectionRewrite>>,
+    
+    // Recent text selection context (TTL: RECENT_SELECTION_CONTEXT_TTL_SECS)
+    recent_selection_context: Mutex<Option<RecentSelectionContext>>,
+    
+    // Last pipeline outputs
+    last_transcript: Mutex<String>,
+    last_assistant_response: Mutex<String>,
+    
+    // Local model download tracking
+    local_stt_download_status: Mutex<LocalSttDownloadStatusResponse>,
+    
+    // Runtime status flag
+    local_stt_runtime_loaded: Mutex<bool>,
+}
+```
+
+**Key Methods:**
+- `set_pending_selection_rewrite()` - Store text pending user confirmation
+- `take_pending_selection_rewrite()` - Consume pending rewrite atomically
+- `set_last_pipeline_output()` - Cache latest transcript + AI response
+- `update_local_stt_download_status()` - Update model download progress
+
+<Note>
+All state methods use mutex guards with poisoning detection. TTL-based cleanup runs automatically on access.
+</Note>
+
+### Local Model Daemons
+
+SlasshyWispr manages long-lived Python processes for local model inference:
+
+#### Coqui TTS Daemon
+```rust
+struct CoquiBridgeDaemon {
+    child: Child,              // Python process handle
+    stdin: ChildStdin,         // JSON-RPC command pipe
+    stdout: BufReader<ChildStdout>, // Response stream
+}
+```
+
+**Daemon Management:**
+- Global daemon pool: `COQUI_DAEMONS: HashMap<String, CoquiBridgeDaemon>`
+- Key format: `{python_path}|{script_path}`
+- Process lifecycle: lazy initialization, persistent across requests
+
+#### Local STT Daemon
+```rust
+struct LocalSttBridgeDaemon {
+    child: Child,
+    stdin: ChildStdin,
+    stdout: BufReader<ChildStdout>,
+    last_used: Instant,        // Idle tracking
+    model_loaded: bool,        // Warm-start status
+}
+```
+
+**Features:**
+- Automatic sweeper for idle daemon cleanup
+- Model preloading for reduced latency
+- Global daemon pool with key-based lookup
+
+#### Native Parakeet Runtime
+```rust
+struct NativeParakeetRuntime {
+    model_key: String,
+    engine: ParakeetEngine,    // Rust-native STT engine
+    last_used: Instant,
+}
+```
+
+<Info>
+The application supports both Python bridge daemons and native Rust engines for STT, with automatic fallback logic.
+</Info>
+
+## TypeScript Frontend Components
+
+### Main Application Structure
+
+From `src/main.ts:141-199` - Core UI initialization:
+
+```typescript
+// Application shell structure
+const appRoot = document.querySelector<HTMLDivElement>("#app");
+
+appRoot.innerHTML = `
+  <div class="app-frame">
+    <header class="app-titlebar">...</header>
+    <div class="flow-shell">
+      <aside class="flow-sidebar">
+        <nav class="nav-main">...</nav>
+      </aside>
+      <main class="flow-content">
+        <section class="flow-page" data-page="home">...</section>
+      </main>
+    </div>
+  </div>
+`;
+```
+
+**Key UI Components:**
+- **Titlebar**: Custom drag region with window controls
+- **Sidebar**: Navigation (Home, Dictionary, Snippets, Notes)
+- **Flow Content**: Page-based content switching
+- **Settings Modal**: Overlay configuration panel
+
+### Window Management
+
+```typescript
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { LogicalSize, getCurrentWindow } from "@tauri-apps/api/window";
+
+// Window manipulation via Tauri API
+const window = getCurrentWindow();
+await window.minimize();
+await window.toggleMaximize();
+await window.close();
+```
+
+### Global Shortcuts
+
+```typescript
+import { register as registerGlobalShortcut } from "@tauri-apps/plugin-global-shortcut";
+
+// Register system-wide hotkey
+await registerGlobalShortcut("CommandOrControl+Shift+Space", (event) => {
+  // Trigger voice capture
+});
+```
+
+## Pipeline Architecture
+
+The core voice processing pipeline: **STT → AI → TTS**
+
+### 1. Speech-to-Text (STT)
+
+**Input**: Base64-encoded audio (from `AssistantPipelineRequest.audio_base64`)
+
+**Processing Flow:**
+
+```rust
+// Request structure
+struct AssistantPipelineRequest {
+    audio_base64: String,
+    audio_mime_type: String,
+    stt_model: Option<String>,
+    local_stt_model: Option<String>,
+    stt_local_mode: Option<bool>,
+    language: Option<String>,
+    allowed_languages: Option<Vec<String>>,
+    // ...
+}
+```
+
+**STT Modes:**
+- **Cloud API**: OpenAI Whisper via HTTP (`stt_model`)
+- **Local Python**: Whisper via Python bridge daemon
+- **Local Native**: Parakeet engine via Rust `transcribe-rs`
+
+**Post-processing:**
+- Dictionary replacements (`dictionary_entries`)
+- Filler word removal (`remove_fillers`)
+- Auto-punctuation (`auto_punctuation`)
+- Numbered list detection (`auto_numbered_lists`)
+
+### 2. AI Processing
+
+**Input**: Transcript text + context
+
+```rust
+struct AssistantPipelineRequest {
+    system_prompt: Option<String>,
+    ai_model: Option<String>,
+    temperature: Option<f32>,
+    max_tokens: Option<u32>,
+    selected_text: Option<String>,  // For selection rewrite mode
+    command_mode: Option<bool>,
+    // ...
+}
+```
+
+**AI Modes:**
+- **Cloud API**: OpenAI/compatible API (`api_base_url`, `ai_model`)
+- **Local Ollama**: Self-hosted models (`local_ollama_base_url`, `local_ollama_model`)
+
+**Context Management:**
+- Recent selection context with TTL expiration
+- Snippet expansion before AI processing
+- Wake word detection for assistant mode
+
+### 3. Text-to-Speech (TTS)
+
+**Input**: AI response text
+
+```rust
+struct AssistantPipelineRequest {
+    tts_engine: Option<String>,  // "piper" | "coqui"
+    piper: Option<PiperPipelineRequest>,
+    coqui: Option<CoquiPipelineRequest>,
+}
+
+struct PiperPipelineRequest {
+    speed: Option<f32>,
+    quality: Option<String>,
+    emotion: Option<String>,
+}
+
+struct CoquiPipelineRequest {
+    python_path: Option<String>,
+    model_name: Option<String>,
+    speaker_id: Option<String>,
+    speed: Option<f32>,
+    use_gpu: Option<bool>,
+    split_sentences: Option<bool>,
+}
+```
+
+**Output**: Base64-encoded audio in `AssistantPipelineResponse.audio_base64`
+
+### Pipeline Response
+
+```rust
+struct AssistantPipelineResponse {
+    mode: String,                      // "dictation" | "command" | "rewrite"
+    selection_rewrite: bool,
+    selection_pending: bool,
+    transcript: String,                // STT output
+    assistant_response: String,        // AI output
+    audio_base64: String,              // TTS output
+    
+    // Performance metrics
+    stt_latency_ms: u64,
+    ai_latency_ms: u64,
+    tts_latency_ms: u64,
+    total_latency_ms: u64,
+}
+```
+
+<Note>
+All pipeline stages are measured independently, allowing performance bottleneck identification.
+</Note>
+
+## State Management Patterns
+
+### TTL-Based Context Cleanup
+
+```rust
+// Automatic expiration on access
+fn cleanup_expired_pending_selection_rewrite(
+    slot: &mut Option<PendingSelectionRewrite>,
+) -> bool {
+    let expired = slot
+        .as_ref()
+        .map(|item| {
+            item.created_at.elapsed() >= Duration::from_secs(PENDING_SELECTION_REWRITE_TTL_SECS)
+        })
+        .unwrap_or(false);
+    if expired {
+        *slot = None;
+    }
+    expired
+}
+```
+
+**TTL Constants:**
+- `PENDING_SELECTION_REWRITE_TTL_SECS` - Rewrite confirmation timeout
+- `RECENT_SELECTION_CONTEXT_TTL_SECS` - Context cache expiration
+
+### Download Progress Tracking
+
+```rust
+struct LocalSttDownloadStatusResponse {
+    active: bool,
+    completed: bool,
+    stage: String,              // "Downloading" | "Extracting" | "Complete"
+    current_file: String,
+    downloaded_bytes: u64,
+    total_bytes: u64,
+    files_completed: usize,
+    files_total: usize,
+    progress_percent: f64,      // Auto-calculated
+    updated_at_ms: u64,
+}
+
+// Atomic updates with auto-timestamping
+fn update_local_stt_download_status<F>(&self, mutator: F) -> Result<(), String>
+where
+    F: FnOnce(&mut LocalSttDownloadStatusResponse),
+{
+    let mut status = self.lock_local_stt_download_status()?;
+    mutator(&mut status);
+    status.progress_percent = calculate_local_stt_progress_percent(&status);
+    status.updated_at_ms = now_unix_ms();
+    Ok(())
+}
+```
+
+## Plugin System
+
+SlasshyWispr uses Tauri's plugin architecture:
+
+### Registered Plugins
+
+1. **`tauri-plugin-global-shortcut`** - System-wide hotkey registration
+2. **`tauri-plugin-log`** - Structured logging to file/console
+
+### Platform-Specific Features
+
+```rust
+#[cfg(target_os = "windows")]
+use windows_sys::Win32::Security::Cryptography::{
+    CryptProtectData,
+    CryptUnprotectData,
+    CRYPTPROTECT_UI_FORBIDDEN,
+};
+```
+
+**Windows-specific:**
+- DPAPI credential encryption
+- `CREATE_NO_WINDOW` flag for daemon processes
+- ZIP archive support for model downloads
+
+**macOS/Linux:**
+- System keyring integration
+- Tar.gz archive extraction
+
+<Info>
+Platform-specific code is conditionally compiled using `#[cfg(target_os = "...")]` attributes, ensuring minimal binary size.
+</Info>
+
+## Performance Optimizations
+
+### HTTP Client Pooling
+
+```rust
+let http = Client::builder()
+    .connect_timeout(Duration::from_secs(10))
+    .timeout(Duration::from_secs(150))
+    .pool_idle_timeout(Duration::from_secs(90))
+    .pool_max_idle_per_host(8)         // Connection reuse
+    .build()
+```
+
+### Daemon Reuse
+
+- Python processes persist across requests
+- Model preloading for zero cold-start latency
+- Idle sweeper to reclaim memory from unused daemons
+
+### Async Processing
+
+- All Tauri commands are `async fn`
+- Non-blocking I/O via `tokio` runtime
+- Parallel HTTP requests where applicable
+
+## Error Handling
+
+All Tauri commands return `Result<T, String>`:
+
+```rust
+#[tauri::command]
+async fn example_command(state: State<'_, AppState>) -> Result<Response, String> {
+    let data = state
+        .last_transcript
+        .lock()
+        .map_err(|_| "State lock poisoned.")?;
+    
+    // Process...
+    
+    Ok(response)
+}
+```
+
+**Error Propagation:**
+- Mutex poisoning detection
+- HTTP errors with context
+- Serialization failures
+- Process spawn failures
+
+<Note>
+All errors are converted to strings for JSON serialization, with detailed context for debugging.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Overview" href="/api/overview">
+    High-level architecture and technology stack
+  </Card>
+  <Card title="Commands Reference" href="/api/commands/assistant">
+    Complete Tauri command API documentation
+  </Card>
+</CardGroup>

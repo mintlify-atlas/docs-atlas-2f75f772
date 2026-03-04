@@ -1,0 +1,681 @@
+---
+title: Troubleshooting Guide
+description: Solutions for common issues with SlasshyWispr including audio problems, model loading, API connections, and performance optimization.
+---
+
+## Common Issues and Solutions
+
+This guide covers solutions to frequently encountered issues with SlasshyWispr. If you don't find your issue here, please visit the [GitHub issues page](https://github.com/SlasshyOverhere/SlasshyWispr/issues).
+
+<Warning>
+  SlasshyWispr is in **strong beta**. Expect bugs, rough edges, and breaking changes while features are actively evolving. Always check for updates in **Settings > Update and Security**.
+</Warning>
+
+## Audio and Microphone Problems
+
+### Microphone Not Detected
+
+<Accordion title="Issue: No microphone appears in device list">
+  **Symptoms**: Empty microphone dropdown or missing devices
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check System Permissions">
+      Ensure SlasshyWispr has microphone permissions in your operating system:
+      - **Windows**: Settings > Privacy > Microphone > Allow apps to access microphone
+      - Verify SlasshyWispr is in the allowed apps list
+    </Step>
+    
+    <Step title="Verify Hardware Connection">
+      - Check that your microphone is physically connected
+      - Try unplugging and reconnecting USB microphones
+      - Test microphone in Windows Sound settings
+    </Step>
+    
+    <Step title="Restart Application">
+      Close and reopen SlasshyWispr after connecting microphone or granting permissions.
+    </Step>
+    
+    <Step title="Check Default Device">
+      Set your preferred microphone as the default recording device in Windows Sound settings.
+    </Step>
+  </Steps>
+</Accordion>
+
+### No Audio Input Detected
+
+<Accordion title="Issue: Microphone connected but not picking up audio">
+  **Symptoms**: Recording starts but no voice detected, transcription is empty
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Test Microphone Levels">
+      - Open Windows Sound Settings
+      - Go to Input > Device properties
+      - Speak and watch the input level meter
+      - Adjust input volume if too low
+    </Step>
+    
+    <Step title="Select Correct Device">
+      In **Settings > General**, verify the correct microphone is selected in the **Microphone Device** dropdown.
+    </Step>
+    
+    <Step title="Check Capture Mode">
+      - Verify your capture mode setting
+      - Try switching between "push-to-talk" and "single-tap"
+      - For push-to-talk, ensure you're holding the hotkey while speaking
+    </Step>
+    
+    <Step title="Disable Exclusive Mode">
+      In Windows microphone properties:
+      - Right-click microphone > Properties
+      - Advanced tab
+      - Uncheck "Allow applications to take exclusive control"
+    </Step>
+  </Steps>
+</Accordion>
+
+### Poor Transcription Quality
+
+<Accordion title="Issue: Transcription has many errors or mistakes">
+  **Symptoms**: Incorrect words, gibberish, missing phrases
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Improve Audio Quality">
+      - Reduce background noise (close windows, turn off fans, mute music)
+      - Use a higher-quality microphone (headset mic or USB mic preferred)
+      - Maintain consistent distance from microphone (6-12 inches for desktop mics)
+      - Speak clearly at normal pace and volume
+    </Step>
+    
+    <Step title="Try Better Models">
+      - For **online mode**: Use higher-quality STT models if available from your provider
+      - For **local mode**: Try larger models:
+        - Switch from Moonshine to Parakeet v3
+        - Switch from Parakeet to Whisper Medium/Large
+        - Check **Settings > Offline STT** for recommendations
+    </Step>
+    
+    <Step title="Configure Language Settings">
+      In **Settings > General**:
+      - Set correct **Dictation Language** for your spoken language
+      - For multi-language use, configure **Dictation Language Mode**
+    </Step>
+    
+    <Step title="Enable Processing Features">
+      Toggle these settings to improve output:
+      - **Auto Punctuation**: Automatically add punctuation
+      - **Remove Fillers**: Filter "um", "uh", etc.
+      - Check **Settings > General** for these options
+    </Step>
+  </Steps>
+</Accordion>
+
+### Recording Cuts Off
+
+<Accordion title="Issue: Recording stops unexpectedly or times out">
+  **Symptoms**: Recording ends before you finish speaking
+  
+  **Solutions**:
+  
+  - **Maximum Duration**: Recordings are limited to 45 seconds (`MAX_RECORDING_MS: 45_000`)
+  - For longer dictation, break into multiple sessions
+  - In push-to-talk mode, ensure you're continuously holding the hotkey
+  - Check if "Mute Music While Dictating" setting is interfering with detection
+  
+  <Note>
+    If you consistently need recordings longer than 45 seconds, consider breaking your dictation into logical segments or phrases.
+  </Note>
+</Accordion>
+
+## Model Loading Issues
+
+### Local STT Model Won't Download
+
+<Accordion title="Issue: Model download fails or gets stuck">
+  **Symptoms**: Download hangs, errors during download, incomplete models
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check Internet Connection">
+      Ensure stable internet connection. Large models (Whisper Large: 1.6GB) require reliable downloads.
+    </Step>
+    
+    <Step title="Verify Disk Space">
+      Check available disk space:
+      - Parakeet models: ~500 MB
+      - Whisper models: 500 MB - 1.6 GB
+      - Ensure 2-3x the model size for extraction and processing
+    </Step>
+    
+    <Step title="Check Download Status">
+      Navigate to **Settings > Offline STT** to view download progress and any error messages.
+    </Step>
+    
+    <Step title="Retry Download">
+      - Cancel stuck download if option available
+      - Close and reopen SlasshyWispr
+      - Attempt download again
+    </Step>
+    
+    <Step title="Try Smaller Model First">
+      Test with smallest model (Moonshine Base: 58 MB) to verify download functionality works.
+    </Step>
+  </Steps>
+</Accordion>
+
+### Local STT Model Won't Load
+
+<Accordion title="Issue: Model downloaded but fails to load or warm up">
+  **Symptoms**: "Model failed to load", errors during warmup, crashes
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check Hardware Requirements">
+      Navigate to **Settings > Offline STT** and check hardware recommendations:
+      - Review your detected CPU, RAM, and GPU
+      - Check "Performance Tier" assessment
+      - Verify selected model matches recommendations
+      - Look for "Selected Model Warning" if your hardware is underpowered
+    </Step>
+    
+    <Step title="Use Recommended Model">
+      The hardware advisor suggests models based on your system:
+      - **High-end GPU**: Whisper Large, Parakeet v3
+      - **Mid-range system**: Parakeet v3, Whisper Medium
+      - **Lower-spec system**: Moonshine Base, SenseVoice
+      
+      Check the "Slasshy Suggestion" in hardware advisor.
+    </Step>
+    
+    <Step title="Verify Model Files">
+      - Use "Open Path" option in model settings to view model directory
+      - Ensure all model files are present and not corrupted
+      - Try deleting and re-downloading if files seem incomplete
+    </Step>
+    
+    <Step title="Check Runtime State">
+      Monitor the runtime state response:
+      - `loaded`: Should be `true` when model is ready
+      - `daemonCount`: Background processes running
+      - `details`: Error messages if loading failed
+    </Step>
+  </Steps>
+  
+  <Warning>
+    Some models require significant RAM and VRAM. Whisper Large models may need 4-8GB RAM and benefit from GPU acceleration. Check hardware advisor before downloading large models.
+  </Warning>
+</Accordion>
+
+### Ollama Connection Failed
+
+<Accordion title="Issue: Cannot connect to Ollama for local AI">
+  **Symptoms**: "Ollama not running", connection errors, model pull fails
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Verify Ollama Installation">
+      Check **Settings > Offline AI** for Ollama status:
+      - `installed`: Should be `true`
+      - `running`: Should be `true`
+      - `version`: Should show Ollama version
+    </Step>
+    
+    <Step title="Start Ollama Service">
+      - Ensure Ollama is running (check system tray or task manager)
+      - Try restarting Ollama service
+      - On Windows, run Ollama from Start menu
+    </Step>
+    
+    <Step title="Check Base URL">
+      In **Settings > Offline AI**, verify **Local Ollama Base URL**:
+      - Default: `http://127.0.0.1:11434`
+      - Ensure no typos
+      - If Ollama runs on different port, update accordingly
+    </Step>
+    
+    <Step title="Test Connection">
+      Try pulling a small model to test connection:
+      - Use model pull feature in settings
+      - Start with a small model like "llama3.2:1b"
+      - Check for error messages in pull response
+    </Step>
+    
+    <Step title="Firewall and Network">
+      - Check Windows Firewall isn't blocking localhost connections
+      - Ensure no VPN or proxy interfering with local connections
+      - Try disabling antivirus temporarily to test
+    </Step>
+  </Steps>
+</Accordion>
+
+## API Connection Errors
+
+### Online API Authentication Failed
+
+<Accordion title="Issue: API key rejected or authentication errors">
+  **Symptoms**: "Invalid API key", "Unauthorized", 401 errors
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Verify API Key">
+      In **Settings > Online**:
+      - Double-check API key for typos
+      - Ensure no extra spaces before/after key
+      - Verify key hasn't expired with your provider
+      - Test key validity on provider's website
+    </Step>
+    
+    <Step title="Check API Base URL">
+      - Ensure correct base URL for your provider
+      - Common formats:
+        - OpenAI: `https://api.openai.com/v1`
+        - Custom providers: Verify correct endpoint
+      - Remove trailing slashes if present
+    </Step>
+    
+    <Step title="Re-enter Credentials">
+      - Clear existing API key
+      - Re-enter fresh copy from provider dashboard
+      - Ensure "Remember API Key" is checked if you want persistence
+    </Step>
+    
+    <Step title="Check Account Status">
+      - Verify API account is active and paid (if required)
+      - Check for billing issues with provider
+      - Ensure usage limits haven't been exceeded
+    </Step>
+  </Steps>
+</Accordion>
+
+### Online API Timeout or Network Errors
+
+<Accordion title="Issue: Connection timeouts, network errors, slow responses">
+  **Symptoms**: Long waits, timeout errors, "Failed to connect" messages
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check Internet Connection">
+      - Verify stable internet connection
+      - Test accessing provider's website in browser
+      - Run speed test to check bandwidth
+    </Step>
+    
+    <Step title="Try Different Network">
+      - Switch between WiFi and wired connection
+      - Disable VPN if active (may interfere)
+      - Try mobile hotspot to rule out network restrictions
+    </Step>
+    
+    <Step title="Check Provider Status">
+      - Visit provider's status page
+      - Check for ongoing outages or maintenance
+      - Review provider's rate limits
+    </Step>
+    
+    <Step title="Switch to Local Models">
+      If online connectivity is unreliable:
+      - Use local STT models (offline mode)
+      - Use local Ollama for AI (offline mode)
+      - See Hybrid Mode guide for configuration
+    </Step>
+  </Steps>
+</Accordion>
+
+### Model Not Found
+
+<Accordion title="Issue: Specified model name not available">
+  **Symptoms**: "Model not found", invalid model name errors
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Verify Model Name">
+      - Check exact model name with your provider
+      - Ensure correct spelling and capitalization
+      - Some providers use specific naming formats
+    </Step>
+    
+    <Step title="Check Available Models">
+      Use provider models feature if available:
+      - **Settings > Online** may show available models
+      - Consult provider's documentation for supported models
+    </Step>
+    
+    <Step title="Update Model Names">
+      - STT Model Name: e.g., "whisper-1"
+      - AI Model Name: e.g., "gpt-4", "gpt-3.5-turbo"
+      - For local Ollama: Verify model is pulled (e.g., "llama3.2")
+    </Step>
+  </Steps>
+</Accordion>
+
+## Performance Optimization
+
+### Slow Response Times
+
+<Accordion title="Issue: Long delays between speaking and receiving results">
+  **Symptoms**: High latency, waiting several seconds for transcription or AI response
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check Pipeline Latency">
+      Navigate to **Settings > Pipeline** to view timing breakdown:
+      - `sttLatencyMs`: Speech-to-text processing time
+      - `aiLatencyMs`: AI model response time
+      - `ttsLatencyMs`: Text-to-speech generation time
+      - Identify which component is slowest
+    </Step>
+    
+    <Step title="Optimize STT Performance">
+      **For local STT**:
+      - Use smaller/faster models (Moonshine Base, Parakeet v3)
+      - Enable GPU acceleration if available
+      - Warm up models before intensive use
+      - Close other applications to free RAM
+      
+      **For online STT**:
+      - Check internet speed
+      - Try different API provider if consistently slow
+    </Step>
+    
+    <Step title="Optimize AI Performance">
+      **For local AI (Ollama)**:
+      - Use smaller models (llama3.2:1b vs llama3.2:70b)
+      - Reduce `maxTokens` setting to limit response length
+      - Ensure Ollama has sufficient system resources
+      - Check Ollama logs for performance issues
+      
+      **For online AI**:
+      - Use faster models from provider
+      - Reduce `maxTokens` (default: 320)
+      - Simplify `systemPrompt` if very long
+    </Step>
+    
+    <Step title="Optimize TTS Performance">
+      In **Settings > TTS**:
+      - Use **Piper** engine (faster than Coqui)
+      - Set Piper Quality to "fast" instead of "high"
+      - Disable TTS if you don't need voice responses
+    </Step>
+    
+    <Step title="System Optimization">
+      - Close unnecessary background applications
+      - Ensure adequate free RAM (4GB+ recommended)
+      - Check CPU usage in Task Manager
+      - Consider upgrading hardware for local models
+    </Step>
+  </Steps>
+</Accordion>
+
+### High CPU or Memory Usage
+
+<Accordion title="Issue: SlasshyWispr consuming excessive system resources">
+  **Symptoms**: High CPU%, high RAM usage, system slowdown, fan noise
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Identify Resource-Intensive Components">
+      - Local STT models use significant RAM (1-4GB) when loaded
+      - Local AI (Ollama) can use 4-16GB depending on model size
+      - Check if multiple models are loaded simultaneously
+    </Step>
+    
+    <Step title="Use Lighter Models">
+      - **STT**: Switch from Whisper Large to Moonshine Base or SenseVoice
+      - **AI**: Use smaller Ollama models (1-3B parameters instead of 7-70B)
+      - Check hardware advisor recommendations
+    </Step>
+    
+    <Step title="Deactivate Unused Models">
+      - Use model deactivation feature in settings
+      - Unload STT models when not in use
+      - Stop Ollama when not needed for local AI
+    </Step>
+    
+    <Step title="Switch to Online Mode">
+      For lower-spec systems:
+      - Use online STT and AI to offload processing
+      - This moves resource usage to cloud providers
+      - See Hybrid Mode guide for configuration
+    </Step>
+  </Steps>
+  
+  <Note>
+    Local models trade system resources for privacy and offline capability. If your system struggles, consider hybrid mode with online components.
+  </Note>
+</Accordion>
+
+### Application Crashes or Freezes
+
+<Accordion title="Issue: SlasshyWispr becomes unresponsive or crashes">
+  **Symptoms**: Application hangs, "Not Responding", sudden crashes
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check System Requirements">
+      Verify your system meets minimum requirements:
+      - RAM: 8GB+ recommended for local models
+      - CPU: Multi-core processor recommended
+      - GPU: NVIDIA GPU helpful for large models
+      - Storage: Sufficient space for models and temp files
+    </Step>
+    
+    <Step title="Update Application">
+      - Check **Settings > Update and Security**
+      - Install latest version
+      - Bug fixes and stability improvements in newer releases
+    </Step>
+    
+    <Step title="Reduce Concurrent Operations">
+      - Don't trigger multiple voice commands simultaneously
+      - Wait for previous operation to complete
+      - Disable wake word if causing issues
+    </Step>
+    
+    <Step title="Clear and Reset">
+      - Deactivate all local models
+      - Restart application
+      - Reload models one at a time
+      - Test with minimal configuration first
+    </Step>
+    
+    <Step title="Check for Conflicts">
+      - Disable antivirus temporarily to test
+      - Close other voice/audio applications
+      - Check Windows Event Viewer for crash details
+    </Step>
+  </Steps>
+</Accordion>
+
+## Feature-Specific Issues
+
+### Wake Word Not Working
+
+<Accordion title="Issue: Wake phrase doesn't activate assistant">
+  **See**: [Wake Word Setup Guide](/guides/wake-word) for detailed troubleshooting
+  
+  **Quick Solutions**:
+  - Verify `wakeWordEnabled: true` in **Settings > General**
+  - Check microphone is selected and working
+  - Speak wake phrase clearly ("Hey [AssistantName]")
+  - Test with different wake phrase patterns
+  - Ensure command mode is enabled
+</Accordion>
+
+### Context Awareness Not Detecting Selection
+
+<Accordion title="Issue: Selected text not recognized by assistant">
+  **See**: [Context Awareness Guide](/guides/context-awareness) for detailed troubleshooting
+  
+  **Quick Solutions**:
+  - Enable `contextAwareness: true` in **Settings > General**
+  - Ensure `commandMode: true`
+  - Select text before activating voice command
+  - Try copying selection manually (Ctrl+C) before command
+  - Verify application allows clipboard access
+</Accordion>
+
+### Hotkeys Not Responding
+
+<Accordion title="Issue: Keyboard shortcuts don't trigger SlasshyWispr">
+  **Symptoms**: Pressing hotkey has no effect
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check Hotkey Configuration">
+      In **Settings > General**:
+      - Verify **Push to Talk Hotkey** (default: `Ctrl+Space`)
+      - Verify **Command Hotkey** (default: `Ctrl+Shift+Space`)
+      - Ensure hotkeys don't conflict with other applications
+    </Step>
+    
+    <Step title="Test Different Hotkeys">
+      - Try changing to different key combination
+      - Avoid combinations used by Windows or other apps
+      - Use modifier keys (Ctrl, Shift, Alt) for uniqueness
+    </Step>
+    
+    <Step title="Check Application State">
+      - Ensure SlasshyWispr is running (check system tray)
+      - Verify app is not in error state
+      - Try restarting application
+    </Step>
+    
+    <Step title="Administrator Privileges">
+      Some applications block hotkeys from apps without admin rights:
+      - Try running SlasshyWispr as administrator
+      - Check if issue only occurs in specific applications
+    </Step>
+  </Steps>
+</Accordion>
+
+### TTS Not Playing Audio
+
+<Accordion title="Issue: No voice response from assistant">
+  **Symptoms**: Assistant processes command but doesn't speak response
+  
+  **Solutions**:
+  
+  <Steps>
+    <Step title="Check TTS Engine">
+      In **Settings > TTS**:
+      - Verify TTS engine is selected (Piper or Coqui)
+      - Default engine is Piper
+      - Coqui may be disabled in zero-Python mode
+    </Step>
+    
+    <Step title="Verify Piper Installation">
+      - Check Piper path in settings
+      - Ensure Piper executable is accessible
+      - Try reinstalling or re-setting up TTS runtime
+    </Step>
+    
+    <Step title="Check Audio Output">
+      - Ensure system volume is not muted
+      - Check default audio output device in Windows
+      - Test audio with other applications
+    </Step>
+    
+    <Step title="Review TTS Settings">
+      - Piper Speed, Quality, and Emotion settings
+      - Try changing to different voice or speed
+      - Reset to defaults if customized
+    </Step>
+  </Steps>
+  
+  <Note>
+    If using Coqui TTS, ensure Python path is correctly configured and TTS dependencies are installed. Piper is recommended for most users.
+  </Note>
+</Accordion>
+
+## Getting Support
+
+### Reporting Issues
+
+If you can't resolve your issue with this guide:
+
+<Steps>
+  <Step title="Gather Information">
+    Before reporting, collect:
+    - SlasshyWispr version (check **Settings > Update and Security**)
+    - Windows version
+    - Hardware specs (CPU, RAM, GPU)
+    - Relevant settings (runtime mode, models, etc.)
+    - Steps to reproduce the issue
+    - Error messages or screenshots
+  </Step>
+  
+  <Step title="Search Existing Issues">
+    Check if your issue is already reported:
+    - Visit [GitHub Issues](https://github.com/SlasshyOverhere/SlasshyWispr/issues)
+    - Search for keywords related to your problem
+    - Review open and closed issues
+  </Step>
+  
+  <Step title="Create New Issue">
+    If no existing issue matches:
+    - Click "New Issue" on GitHub
+    - Use descriptive title
+    - Provide detailed description with:
+      - What you expected to happen
+      - What actually happened
+      - Steps to reproduce
+      - System information
+      - Screenshots or logs if applicable
+  </Step>
+</Steps>
+
+### Community Support
+
+<Tip>
+  Contributions are accepted and welcome! If you fix an issue or improve documentation, please open a pull request on GitHub.
+</Tip>
+
+### Update and Maintenance
+
+<Steps>
+  <Step title="Check for Updates Regularly">
+    Navigate to **Settings > Update and Security** to check for new versions.
+  </Step>
+  
+  <Step title="Review Release Notes">
+    When updates are available, review release notes for:
+    - Bug fixes that may resolve your issue
+    - New features or improvements
+    - Breaking changes that may affect your configuration
+  </Step>
+  
+  <Step title="Install Updates">
+    - Use in-app update feature
+    - Or download manually from [Releases page](https://github.com/SlasshyOverhere/SlasshyWispr/releases/latest)
+  </Step>
+</Steps>
+
+<Warning>
+  Always backup your settings and data before major updates. While settings are typically preserved, it's safer to have a backup.
+</Warning>
+
+## Additional Resources
+
+- **GitHub Repository**: [SlasshyOverhere/SlasshyWispr](https://github.com/SlasshyOverhere/SlasshyWispr)
+- **Issues Tracker**: [Report bugs and feature requests](https://github.com/SlasshyOverhere/SlasshyWispr/issues)
+- **Latest Releases**: [Download updates](https://github.com/SlasshyOverhere/SlasshyWispr/releases/latest)
+- **Demo Video**: See SlasshyWispr in action (check README)
+
+<Note>
+  This troubleshooting guide is based on SlasshyWispr's beta version. Some issues may be resolved in future updates. Always use the latest version for the best experience.
+</Note>

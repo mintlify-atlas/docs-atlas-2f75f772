@@ -1,0 +1,391 @@
+---
+title: Ollama Integration
+description: Setup and configure Ollama for local AI model inference in SlasshyWispr
+---
+
+Ollama enables SlasshyWispr to run large language models locally for completely offline AI assistance.
+
+## What is Ollama?
+
+Ollama is a lightweight, extensible framework for running large language models on your local machine. It provides:
+
+- **Local AI Inference**: Run models like Llama, Mistral, and Gemma without internet
+- **Simple API**: Compatible with OpenAI API format
+- **Model Management**: Easy model pulling, updating, and version control
+- **Cross-Platform**: Works on macOS, Linux, and Windows
+- **GPU Acceleration**: Automatic CUDA and Metal support
+
+<Info>
+  SlasshyWispr communicates with Ollama via HTTP API calls, keeping your conversations completely private and offline.
+</Info>
+
+## Installation and Setup
+
+<Steps>
+  <Step title="Install Ollama">
+    Download and install Ollama from [ollama.ai](https://ollama.ai)
+    
+    **macOS / Linux:**
+    ```bash
+    curl -fsSL https://ollama.ai/install.sh | sh
+    ```
+    
+    **Windows:**
+    Download the installer from the Ollama website
+  </Step>
+  
+  <Step title="Start Ollama Service">
+    Ollama runs as a background service after installation.
+    
+    **macOS / Linux:**
+    ```bash
+    ollama serve
+    ```
+    
+    **Windows:**
+    Ollama starts automatically after installation
+    
+    <Note>
+      The Ollama service must be running for SlasshyWispr to communicate with it.
+    </Note>
+  </Step>
+  
+  <Step title="Verify Installation">
+    Check that Ollama is running:
+    
+    ```bash
+    ollama --version
+    ```
+    
+    Test the API endpoint:
+    
+    ```bash
+    curl http://127.0.0.1:11434/api/tags
+    ```
+  </Step>
+</Steps>
+
+## Ollama Base URL Configuration
+
+SlasshyWispr connects to Ollama via its HTTP API endpoint.
+
+### Default Configuration
+
+The default Ollama base URL is:
+```
+http://127.0.0.1:11434
+```
+
+This is the standard local endpoint where Ollama serves its API.
+
+### Custom Base URL
+
+You can configure a custom base URL if:
+- Ollama is running on a different port
+- Ollama is running on a remote machine
+- You're using a reverse proxy
+
+<Steps>
+  <Step title="Open Settings">
+    Navigate to **Settings** > **Offline** in SlasshyWispr
+  </Step>
+  
+  <Step title="Update Base URL">
+    Find the **Ollama Base URL** field and enter your custom URL
+    
+    Examples:
+    - Different port: `http://127.0.0.1:8080`
+    - Remote server: `http://192.168.1.100:11434`
+    - HTTPS endpoint: `https://ollama.example.com`
+  </Step>
+  
+  <Step title="Test Connection">
+    SlasshyWispr will automatically verify the connection to your Ollama instance
+  </Step>
+</Steps>
+
+<Warning>
+  Using a remote Ollama instance over the internet may expose your conversations to network monitoring. Use HTTPS and secure networking when connecting to remote instances.
+</Warning>
+
+## Model Pulling
+
+Before using a model with SlasshyWispr, you need to pull it from the Ollama library.
+
+### Using Ollama CLI
+
+<Steps>
+  <Step title="Browse Available Models">
+    Visit [ollama.ai/library](https://ollama.ai/library) to see available models
+  </Step>
+  
+  <Step title="Pull a Model">
+    Use the Ollama CLI to download a model:
+    
+    ```bash
+    ollama pull llama3.2
+    ```
+    
+    Other popular models:
+    ```bash
+    ollama pull mistral
+    ollama pull gemma2
+    ollama pull qwen2.5
+    ```
+  </Step>
+  
+  <Step title="Wait for Download">
+    Models range from 1GB to 40GB+ depending on size. Download time varies by internet speed.
+  </Step>
+  
+  <Step title="Verify Model">
+    List downloaded models:
+    
+    ```bash
+    ollama list
+    ```
+  </Step>
+</Steps>
+
+### Using SlasshyWispr UI
+
+<Steps>
+  <Step title="Open Offline Settings">
+    Navigate to **Settings** > **Offline** tab
+  </Step>
+  
+  <Step title="Enter Model Name">
+    In the **Local Ollama Model** field, type the model name (e.g., `llama3.2`)
+  </Step>
+  
+  <Step title="Pull Model">
+    Click **Pull Model** to download directly from SlasshyWispr
+    
+    Progress will be shown with:
+    - Download status
+    - Model being pulled
+    - Success/failure indication
+  </Step>
+</Steps>
+
+<Info>
+  Models pulled via either method are stored in Ollama's model directory and accessible to both Ollama CLI and SlasshyWispr.
+</Info>
+
+## Ollama Status Checking
+
+SlasshyWispr continuously monitors your Ollama installation status.
+
+### Status Response Fields
+
+The Ollama status check returns:
+
+```typescript
+interface OllamaStatusResponse {
+  installed: boolean;      // Whether Ollama is installed on the system
+  running: boolean;        // Whether Ollama service is currently running
+  version: string;         // Ollama version (e.g., "0.1.27")
+  details: string;         // Additional status information or errors
+}
+```
+
+### Status Indicators
+
+In SlasshyWispr Settings > Offline:
+
+- **Green dot**: Ollama installed and running
+- **Yellow dot**: Ollama installed but not running
+- **Red dot**: Ollama not detected or error
+
+### Common Status Issues
+
+<Steps>
+  <Step title="Ollama Not Installed">
+    **Status**: `installed: false`
+    
+    **Solution**: Install Ollama following the steps above
+  </Step>
+  
+  <Step title="Ollama Not Running">
+    **Status**: `installed: true, running: false`
+    
+    **Solution**: Start the Ollama service:
+    ```bash
+    ollama serve
+    ```
+  </Step>
+  
+  <Step title="Connection Refused">
+    **Status**: Connection error in details
+    
+    **Solution**: Check that Ollama base URL is correct and firewall allows local connections
+  </Step>
+</Steps>
+
+## Compatible Models
+
+SlasshyWispr works with any Ollama-compatible model. Here are recommended models by use case:
+
+### Conversational AI
+
+<CardGroup cols={2}>
+  <Card title="Llama 3.2" icon="meta">
+    Fast, efficient, excellent for general conversation
+    
+    ```bash
+    ollama pull llama3.2
+    ```
+  </Card>
+  
+  <Card title="Mistral" icon="wind">
+    Balanced performance and quality
+    
+    ```bash
+    ollama pull mistral
+    ```
+  </Card>
+  
+  <Card title="Gemma 2" icon="google">
+    Google's efficient language model
+    
+    ```bash
+    ollama pull gemma2
+    ```
+  </Card>
+  
+  <Card title="Qwen 2.5" icon="brain">
+    Strong multilingual capabilities
+    
+    ```bash
+    ollama pull qwen2.5
+    ```
+  </Card>
+</CardGroup>
+
+### Model Sizes
+
+Most models come in multiple sizes (parameter counts):
+
+| Size | RAM Required | Performance |
+|------|--------------|-------------|
+| 1B-3B | 4-8 GB | Fast, basic tasks |
+| 7B-8B | 8-16 GB | Balanced, good quality |
+| 13B-14B | 16-32 GB | High quality |
+| 30B+ | 32+ GB | Best quality, slower |
+
+<Note>
+  Pull specific sizes by appending the parameter count:
+  ```bash
+  ollama pull llama3.2:1b
+  ollama pull llama3.2:3b
+  ollama pull mistral:7b
+  ```
+</Note>
+
+### Specialized Models
+
+- **Code Generation**: `codellama`, `deepseek-coder`
+- **Chat Optimized**: Models with `:chat` or `:instruct` tags
+- **Uncensored**: Models with `:uncensored` tag for unrestricted responses
+
+## Testing Your Setup
+
+<Steps>
+  <Step title="Verify Ollama Status">
+    In SlasshyWispr Settings > Offline, confirm Ollama shows as installed and running
+  </Step>
+  
+  <Step title="Select Local Mode">
+    In Settings > Models, set **AI Runtime Mode** to **Local**
+  </Step>
+  
+  <Step title="Choose Model">
+    Select your pulled model from the **Local Ollama Model** dropdown
+  </Step>
+  
+  <Step title="Test Dictation">
+    Use your push-to-talk hotkey and ask a question
+    
+    Example: "What is the capital of France?"
+  </Step>
+  
+  <Step title="Verify Response">
+    You should receive a response generated entirely locally without internet
+  </Step>
+</Steps>
+
+## Performance Optimization
+
+### GPU Acceleration
+
+Ollama automatically uses GPU when available:
+- **NVIDIA GPUs**: Requires CUDA toolkit
+- **Apple Silicon**: Uses Metal acceleration
+- **AMD GPUs**: ROCm support (Linux)
+
+<Info>
+  Check GPU usage during inference:
+  ```bash
+  ollama ps
+  ```
+</Info>
+
+### Context Window
+
+Adjust context size for longer conversations:
+```bash
+ollama run llama3.2 --ctx-size 4096
+```
+
+### Concurrent Requests
+
+Ollama can handle multiple requests. Configure in Ollama settings:
+```bash
+export OLLAMA_NUM_PARALLEL=2
+```
+
+## Troubleshooting
+
+### Model Pull Fails
+
+**Issue**: Cannot download model
+
+**Solutions**:
+- Check internet connection
+- Verify sufficient disk space (models are large)
+- Try pulling via Ollama CLI directly
+- Check Ollama logs for errors
+
+### Slow Inference
+
+**Issue**: AI responses take too long
+
+**Solutions**:
+- Use a smaller model (3B instead of 13B)
+- Enable GPU acceleration if available
+- Close other resource-intensive applications
+- Check [hardware requirements](/local/hardware-requirements)
+
+### Connection Errors
+
+**Issue**: SlasshyWispr cannot connect to Ollama
+
+**Solutions**:
+- Verify Ollama is running: `ollama serve`
+- Check base URL matches Ollama's listening address
+- Test manually: `curl http://127.0.0.1:11434/api/tags`
+- Check firewall settings for localhost connections
+
+### Out of Memory
+
+**Issue**: Model fails to load or crashes
+
+**Solutions**:
+- Use a smaller model variant
+- Close other applications to free RAM
+- Increase system swap space
+- See [hardware requirements](/local/hardware-requirements) for RAM recommendations
+
+<Warning>
+  Running models larger than your available RAM will cause severe performance degradation or crashes. Always choose models appropriate for your hardware.
+</Warning>

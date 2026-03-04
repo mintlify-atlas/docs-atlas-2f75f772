@@ -1,0 +1,438 @@
+---
+title: 'Model Management Commands'
+description: 'Commands for managing local STT models, Ollama models, and TTS voices'
+---
+
+## Local STT Models
+
+### download_local_stt_model
+
+Downloads a local speech-to-text model from Hugging Face.
+
+```typescript
+await invoke('download_local_stt_model', {
+  model: 'nvidia/parakeet-tdt_ctc-110m'
+});
+```
+
+<ParamField path="model" type="string" required>
+  Model identifier (e.g., `nvidia/parakeet-tdt_ctc-110m`, `usefulsensors/moonshine-base`)
+</ParamField>
+
+**Response:**
+
+<ResponseField name="model" type="string">
+  Canonical model name
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Model provider (`parakeet`, `whisper`, `moonshine`, etc.)
+</ResponseField>
+
+<ResponseField name="method" type="string">
+  Download method used
+</ResponseField>
+
+<ResponseField name="localPath" type="string">
+  Local filesystem path where model is stored
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Human-readable status message
+</ResponseField>
+
+### warmup_local_stt_daemon
+
+Preloads a local STT model into memory for faster inference.
+
+```typescript
+await invoke('warmup_local_stt_model', {
+  model: 'nvidia/parakeet-tdt_ctc-110m'
+});
+```
+
+<ParamField path="model" type="string" required>
+  Model identifier to warm up
+</ParamField>
+
+**Response:**
+
+<ResponseField name="model" type="string">
+  Model name
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Model provider
+</ResponseField>
+
+<ResponseField name="warmed" type="boolean">
+  Whether warmup succeeded
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Status details
+</ResponseField>
+
+### deactivate_local_stt_daemon
+
+Unloads a local STT model from memory.
+
+```typescript
+await invoke('deactivate_local_stt_model', {
+  model: 'nvidia/parakeet-tdt_ctc-110m'  // Optional
+});
+```
+
+<ParamField path="model" type="string">
+  Model to deactivate (omit to deactivate all)
+</ParamField>
+
+**Response:**
+
+<ResponseField name="model" type="string">
+  Deactivated model name
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Model provider
+</ResponseField>
+
+<ResponseField name="deactivated" type="boolean">
+  Whether deactivation succeeded
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Status details
+</ResponseField>
+
+### get_local_stt_hardware_advice
+
+Analyzes system hardware and recommends appropriate STT models.
+
+```typescript
+await invoke('get_local_stt_hardware_advice', {
+  selectedModel: 'nvidia/parakeet-tdt_ctc-110m'  // Optional
+});
+```
+
+<ParamField path="selectedModel" type="string">
+  Currently selected model to validate against hardware
+</ParamField>
+
+**Response:**
+
+<ResponseField name="cpuName" type="string">
+  CPU model name
+</ResponseField>
+
+<ResponseField name="logicalCores" type="number">
+  Number of logical CPU cores
+</ResponseField>
+
+<ResponseField name="totalRamGb" type="number">
+  Total system RAM in gigabytes
+</ResponseField>
+
+<ResponseField name="nvidiaGpuDetected" type="boolean">
+  Whether NVIDIA GPU is available
+</ResponseField>
+
+<ResponseField name="gpuName" type="string">
+  GPU model name
+</ResponseField>
+
+<ResponseField name="gpuVramGb" type="number">
+  GPU VRAM in gigabytes
+</ResponseField>
+
+<ResponseField name="performanceTier" type="string">
+  Hardware tier: `high`, `medium`, `low`
+</ResponseField>
+
+<ResponseField name="slasshySuggestionModel" type="string">
+  Recommended model for this hardware
+</ResponseField>
+
+<ResponseField name="suggestedModels" type="string[]">
+  List of recommended models
+</ResponseField>
+
+<ResponseField name="cautionModels" type="string[]">
+  Models that may be too demanding
+</ResponseField>
+
+<ResponseField name="selectedModelWarning" type="string">
+  Warning message if selected model is unsuitable
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Additional hardware details
+</ResponseField>
+
+### delete_local_stt_model
+
+Deletes a downloaded local STT model.
+
+```typescript
+await invoke('delete_local_stt_model', {
+  model: 'nvidia/parakeet-tdt_ctc-110m'
+});
+```
+
+<ParamField path="model" type="string" required>
+  Model identifier to delete
+</ParamField>
+
+**Response:**
+
+<ResponseField name="model" type="string">
+  Deleted model name
+</ResponseField>
+
+<ResponseField name="repoId" type="string">
+  Hugging Face repository ID
+</ResponseField>
+
+<ResponseField name="removed" type="boolean">
+  Whether deletion succeeded
+</ResponseField>
+
+<ResponseField name="localPath" type="string">
+  Path that was deleted
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Deletion status
+</ResponseField>
+
+## Ollama Models
+
+### pull_ollama_model
+
+Downloads a model from Ollama registry.
+
+```typescript
+await invoke('pull_ollama_model', {
+  baseUrl: 'http://localhost:11434',  // Optional
+  model: 'llama3.2:3b'
+});
+```
+
+<ParamField path="model" type="string" required>
+  Ollama model identifier (e.g., `llama3.2:3b`, `mistral:latest`)
+</ParamField>
+
+<ParamField path="baseUrl" type="string">
+  Ollama API base URL (defaults to `http://localhost:11434`)
+</ParamField>
+
+**Response:**
+
+<ResponseField name="baseUrl" type="string">
+  Ollama base URL used
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  Model name
+</ResponseField>
+
+<ResponseField name="ok" type="boolean">
+  Whether pull succeeded
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Pull status message
+</ResponseField>
+
+### get_ollama_status
+
+Checks if Ollama is installed and running.
+
+```typescript
+await invoke('get_ollama_status', {
+  baseUrl: 'http://localhost:11434'  // Optional
+});
+```
+
+<ParamField path="baseUrl" type="string">
+  Ollama base URL to check
+</ParamField>
+
+**Response:**
+
+<ResponseField name="installed" type="boolean">
+  Whether Ollama is installed
+</ResponseField>
+
+<ResponseField name="running" type="boolean">
+  Whether Ollama service is reachable
+</ResponseField>
+
+<ResponseField name="version" type="string">
+  Ollama version string
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Additional status information
+</ResponseField>
+
+### get_provider_models
+
+Fetches available models from an OpenAI-compatible provider.
+
+```typescript
+await invoke('fetch_provider_models', {
+  apiKey: 'sk-...',
+  apiBaseUrl: 'https://api.openai.com/v1'  // Optional
+});
+```
+
+<ParamField path="apiKey" type="string" required>
+  Provider API key
+</ParamField>
+
+<ParamField path="apiBaseUrl" type="string">
+  API base URL (defaults to OpenAI)
+</ParamField>
+
+**Response:**
+
+<ResponseField name="baseUrl" type="string">
+  Base URL used
+</ResponseField>
+
+<ResponseField name="models" type="string[]">
+  List of available model IDs
+</ResponseField>
+
+## TTS Voice Management
+
+### install_piper_voice
+
+Downloads and installs a Piper TTS voice model.
+
+```typescript
+await invoke('ensure_voice_model', {
+  // Internal command - automatically handled by setup_assistant_runtime
+});
+```
+
+**Response:**
+
+<ResponseField name="modelPath" type="string">
+  Path to installed voice model
+</ResponseField>
+
+<ResponseField name="configPath" type="string">
+  Path to voice config file
+</ResponseField>
+
+### coqui_clone_voice
+
+Clones a voice from audio sample using Coqui TTS.
+
+```typescript
+await invoke('clone_coqui_voice', {
+  pythonPath: '/path/to/python',  // Optional
+  modelName: 'tts_models/multilingual/multi-dataset/xtts_v2',  // Optional
+  language: 'en',  // Optional
+  speakerId: 'my_voice',
+  audioBase64: voiceSampleBase64,
+  fileName: 'sample.wav',  // Optional
+  useGpu: true  // Optional
+});
+```
+
+<ParamField path="speakerId" type="string" required>
+  Unique ID for the cloned voice
+</ParamField>
+
+<ParamField path="audioBase64" type="string" required>
+  Base64-encoded audio sample (5-30 seconds recommended)
+</ParamField>
+
+<ParamField path="pythonPath" type="string">
+  Custom Python executable path
+</ParamField>
+
+<ParamField path="modelName" type="string">
+  Coqui TTS model to use
+</ParamField>
+
+<ParamField path="language" type="string">
+  Target language code
+</ParamField>
+
+<ParamField path="fileName" type="string">
+  Original audio filename
+</ParamField>
+
+<ParamField path="useGpu" type="boolean">
+  Enable GPU acceleration
+</ParamField>
+
+**Response:**
+
+<ResponseField name="speakerId" type="string">
+  Created voice ID
+</ResponseField>
+
+<ResponseField name="durationSeconds" type="number">
+  Audio sample duration
+</ResponseField>
+
+<ResponseField name="voiceDir" type="string">
+  Voice storage directory
+</ResponseField>
+
+<ResponseField name="voices" type="string[]">
+  List of all available voices
+</ResponseField>
+
+<ResponseField name="previewAudioBase64" type="string">
+  Base64-encoded preview audio
+</ResponseField>
+
+## Example Usage
+
+<Tabs>
+  <Tab title="Local STT">
+    ```typescript
+    // Download and warm up a local STT model
+    await invoke('download_local_stt_model', {
+      model: 'nvidia/parakeet-tdt_ctc-110m'
+    });
+
+    await invoke('warmup_local_stt_model', {
+      model: 'nvidia/parakeet-tdt_ctc-110m'
+    });
+    ```
+  </Tab>
+  
+  <Tab title="Ollama">
+    ```typescript
+    // Check Ollama status and pull a model
+    const status = await invoke('get_ollama_status', {});
+    
+    if (status.running) {
+      await invoke('pull_ollama_model', {
+        model: 'llama3.2:3b'
+      });
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Voice Cloning">
+    ```typescript
+    // Clone a voice from audio
+    const result = await invoke('clone_coqui_voice', {
+      speakerId: 'john_voice',
+      audioBase64: sampleAudio,
+      language: 'en',
+      useGpu: true
+    });
+    
+    console.log('Cloned voice:', result.speakerId);
+    ```
+  </Tab>
+</Tabs>

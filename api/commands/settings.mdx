@@ -1,0 +1,314 @@
+---
+title: 'Settings & System Commands'
+description: 'Commands for configuring the assistant, runtime setup, and app updates'
+---
+
+## Assistant Configuration
+
+### get_assistant_info
+
+Retrieves current assistant configuration and installed components.
+
+```typescript
+const info = await invoke<AssistantInfoResponse>('get_assistant_info');
+```
+
+**Response:**
+
+<ResponseField name="appVersion" type="string">
+  Current application version
+</ResponseField>
+
+<ResponseField name="baseUrl" type="string">
+  Default API base URL
+</ResponseField>
+
+<ResponseField name="sttModel" type="string">
+  Default STT model name
+</ResponseField>
+
+<ResponseField name="aiModel" type="string">
+  Default AI model name
+</ResponseField>
+
+<ResponseField name="piperInstalled" type="boolean">
+  Whether Piper TTS is installed
+</ResponseField>
+
+<ResponseField name="piperPath" type="string">
+  Path to Piper executable
+</ResponseField>
+
+<ResponseField name="voiceInstalled" type="boolean">
+  Whether TTS voice model is installed
+</ResponseField>
+
+<ResponseField name="voiceModelPath" type="string">
+  Path to voice model file
+</ResponseField>
+
+<ResponseField name="voiceConfigPath" type="string">
+  Path to voice config file
+</ResponseField>
+
+<ResponseField name="coquiInstalled" type="boolean">
+  Whether Coqui TTS is installed
+</ResponseField>
+
+<ResponseField name="coquiPythonPath" type="string">
+  Path to Coqui Python environment
+</ResponseField>
+
+## Runtime Setup
+
+### setup_runtime
+
+Sets up the TTS runtime environment (Piper + voice model).
+
+```typescript
+const setup = await invoke<RuntimeSetupResponse>('setup_assistant_runtime', {
+  piperPath: '/custom/path/to/piper'  // Optional
+});
+```
+
+<ParamField path="piperPath" type="string">
+  Custom Piper executable path (auto-detected if omitted)
+</ParamField>
+
+**Response:**
+
+<ResponseField name="piperPath" type="string">
+  Installed Piper executable path
+</ResponseField>
+
+<ResponseField name="voiceModelPath" type="string">
+  Installed voice model path
+</ResponseField>
+
+<ResponseField name="voiceConfigPath" type="string">
+  Installed voice config path
+</ResponseField>
+
+### validate_piper_setup
+
+Validates that Piper TTS is correctly configured.
+
+```typescript
+const validation = await invoke<PiperValidationResponse>('validate_piper', {
+  piperPath: '/path/to/piper'  // Optional
+});
+```
+
+<ParamField path="piperPath" type="string">
+  Piper path to validate (uses default if omitted)
+</ParamField>
+
+**Response:**
+
+<ResponseField name="ok" type="boolean">
+  Whether validation passed
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Validation result details
+</ResponseField>
+
+### validate_coqui_setup
+
+Validates that Coqui TTS is correctly configured.
+
+```typescript
+const validation = await invoke<CoquiValidationResponse>('validate_coqui', {
+  pythonPath: '/path/to/python'  // Optional
+});
+```
+
+<ParamField path="pythonPath" type="string">
+  Python environment path to validate
+</ParamField>
+
+**Response:**
+
+<ResponseField name="ok" type="boolean">
+  Whether validation passed
+</ResponseField>
+
+<ResponseField name="details" type="string">
+  Validation result details
+</ResponseField>
+
+## App Updates
+
+### check_for_app_update
+
+Checks for available application updates from GitHub releases.
+
+```typescript
+const update = await invoke<AppUpdateCheckResponse>('check_for_app_update');
+```
+
+**Response:**
+
+<ResponseField name="currentVersion" type="string">
+  Currently installed version
+</ResponseField>
+
+<ResponseField name="latestVersion" type="string">
+  Latest available version
+</ResponseField>
+
+<ResponseField name="available" type="boolean">
+  Whether an update is available
+</ResponseField>
+
+<ResponseField name="releaseName" type="string">
+  Release title
+</ResponseField>
+
+<ResponseField name="releaseNotes" type="string">
+  Markdown-formatted release notes
+</ResponseField>
+
+<ResponseField name="publishedAt" type="string">
+  Release publication date (ISO 8601)
+</ResponseField>
+
+<ResponseField name="releaseUrl" type="string">
+  GitHub release page URL
+</ResponseField>
+
+<ResponseField name="installerDownloadUrl" type="string">
+  Direct download URL for installer
+</ResponseField>
+
+<ResponseField name="installerAssetName" type="string">
+  Installer filename
+</ResponseField>
+
+### install_app_update
+
+Downloads and installs an application update.
+
+```typescript
+await invoke('download_and_install_app_update', {
+  downloadUrl: 'https://github.com/.../installer.exe',
+  assetName: 'SlasshyWispr_1.2.0_setup.exe',  // Optional
+  silent: true  // Optional
+});
+```
+
+<ParamField path="downloadUrl" type="string" required>
+  Installer download URL (must be from trusted source)
+</ParamField>
+
+<ParamField path="assetName" type="string">
+  Installer filename
+</ParamField>
+
+<ParamField path="silent" type="boolean" default="true">
+  Run installer in silent mode
+</ParamField>
+
+<Note>
+  This command is currently **Windows-only**. The app will automatically exit after launching the installer.
+</Note>
+
+## System Integration
+
+### configure_launch_at_login
+
+Enables or disables app launch at system startup.
+
+```typescript
+await invoke('configure_launch_at_login', {
+  enabled: true
+});
+```
+
+<ParamField path="enabled" type="boolean" required>
+  Whether to launch at login
+</ParamField>
+
+<Note>
+  Currently **Windows-only**. Adds/removes registry entry in `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
+</Note>
+
+## Examples
+
+<Tabs>
+  <Tab title="Check Status">
+    ```typescript
+    // Get complete assistant status
+    const info = await invoke<AssistantInfoResponse>('get_assistant_info');
+    
+    console.log('App version:', info.appVersion);
+    console.log('Piper installed:', info.piperInstalled);
+    console.log('Coqui installed:', info.coquiInstalled);
+    console.log('Voice ready:', info.voiceInstalled);
+    ```
+  </Tab>
+  
+  <Tab title="Setup Runtime">
+    ```typescript
+    // Setup Piper TTS runtime
+    const runtime = await invoke<RuntimeSetupResponse>('setup_assistant_runtime', {});
+    
+    console.log('Piper path:', runtime.piperPath);
+    console.log('Voice model:', runtime.voiceModelPath);
+    
+    // Validate setup
+    const validation = await invoke<PiperValidationResponse>('validate_piper', {});
+    if (!validation.ok) {
+      console.error('Validation failed:', validation.details);
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Update App">
+    ```typescript
+    // Check for updates
+    const update = await invoke<AppUpdateCheckResponse>('check_for_app_update');
+    
+    if (update.available) {
+      console.log(`Update available: ${update.latestVersion}`);
+      console.log('Release notes:', update.releaseNotes);
+      
+      // Install update
+      await invoke('download_and_install_app_update', {
+        downloadUrl: update.installerDownloadUrl,
+        assetName: update.installerAssetName,
+        silent: true
+      });
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Configure Startup">
+    ```typescript
+    // Enable launch at login
+    await invoke('configure_launch_at_login', {
+      enabled: true
+    });
+    
+    console.log('App will now launch at startup');
+    ```
+  </Tab>
+</Tabs>
+
+## Platform Support
+
+Some commands have platform-specific implementations:
+
+| Command | Windows | macOS | Linux |
+|---------|---------|-------|-------|
+| `get_assistant_info` | ✅ | ✅ | ✅ |
+| `setup_runtime` | ✅ | ✅ | ✅ |
+| `validate_piper_setup` | ✅ | ✅ | ✅ |
+| `validate_coqui_setup` | ✅ | ✅ | ✅ |
+| `check_for_app_update` | ✅ | ✅ | ✅ |
+| `install_app_update` | ✅ | ❌ | ❌ |
+| `configure_launch_at_login` | ✅ | ❌ | ❌ |
+
+<Info>
+  Platform-specific commands will return an error on unsupported platforms indicating the limitation.
+</Info>

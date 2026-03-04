@@ -1,0 +1,318 @@
+---
+title: Assistant Mode
+description: AI-powered voice assistant with wake word activation, context awareness, and response playback
+---
+
+# Assistant Mode
+
+Assistant Mode transforms SlasshyWispr from a simple transcription tool into an intelligent AI companion that can answer questions, rewrite text, and provide context-aware responses with natural voice playback.
+
+## Dictation vs Assistant Mode
+
+Understanding the difference between these two modes is key to using SlasshyWispr effectively:
+
+<Tabs>
+  <Tab title="Voice Dictation">
+    **Voice Dictation** converts speech to text.
+    
+    - Transcribes your words verbatim
+    - No AI processing or interpretation
+    - Outputs text to clipboard or auto-paste
+    - Faster and more predictable
+    - Works entirely offline with local STT models
+    
+    **Best for:** Taking notes, writing emails, drafting documents
+  </Tab>
+  
+  <Tab title="Assistant Mode">
+    **Assistant Mode** uses AI to understand and respond.
+    
+    - Interprets your speech as a query or command
+    - Generates AI responses via language models
+    - Can rewrite selected text with context
+    - Includes TTS playback of responses
+    - Requires AI model (online or local)
+    
+    **Best for:** Asking questions, getting summaries, rewriting content
+  </Tab>
+</Tabs>
+
+```typescript
+interface AssistantPipelineResponse {
+  mode: "assistant" | "dictation";  // Current mode
+  selectionRewrite: boolean;         // Rewriting selected text
+  selectionContextUsed: boolean;     // Context was included
+  transcript: string;                // Your speech transcribed
+  assistantResponse: string;         // AI response
+  audioBase64: string;              // TTS audio for response
+  sttLatencyMs: number;             // Speech-to-text time
+  aiLatencyMs: number;              // AI generation time
+  ttsLatencyMs: number;             // Text-to-speech time
+}
+```
+
+<Info>
+Assistant Mode uses the full pipeline: STT → AI → TTS, while dictation only uses STT.
+</Info>
+
+## Wake Word Activation
+
+Wake words let you trigger assistant mode naturally by speaking a custom phrase:
+
+### How Wake Words Work
+
+1. Enable wake word detection in **Settings > General**
+2. Configure your assistant's name (default: `"Lily"`)
+3. Start your speech with the wake phrase (e.g., "Hey Lily...")
+4. SlasshyWispr detects the wake word and enters assistant mode
+5. Your query is processed and answered with AI
+
+### Wake Word Configuration
+
+```typescript
+interface PersistedSettings {
+  wakeWordEnabled: boolean;      // Enable wake word detection
+  assistantName: string;         // Your assistant's name
+  commandMode: boolean;          // Always use assistant mode
+}
+
+const DEFAULT_ASSISTANT_NAME = "Lily";
+```
+
+### Wake Word Examples
+
+| Wake Phrase | Assistant Name | Result |
+|-------------|----------------|--------|
+| "Hey Lily, what's the weather?" | Lily | Triggers assistant mode, asks about weather |
+| "Jarvis, summarize this paragraph" | Jarvis | Assistant mode with selection rewrite |
+| "Computer, set a reminder" | Computer | Assistant processes reminder request |
+
+<Tip>
+Choose an assistant name that's easy to pronounce and unlikely to appear in normal conversation to avoid accidental activation.
+</Tip>
+
+## Context Awareness Feature
+
+Context awareness allows the assistant to see and work with text you've selected:
+
+### How Context Awareness Works
+
+1. Select text in any application
+2. Activate assistant mode with hotkey or wake word
+3. SlasshyWispr captures the selected text as context
+4. Your spoken command is combined with the selection
+5. AI generates a response based on both inputs
+
+```typescript
+interface PersistedSettings {
+  contextAwareness: boolean;  // Enable context from selection
+}
+
+interface AssistantPipelineResponse {
+  selectionRewrite: boolean;           // Is this a rewrite operation?
+  selectionPending: boolean;           // Selection capture in progress
+  selectionContextCleared: boolean;    // Context was cleared
+  selectionContextUsed: boolean;       // Context was included in AI prompt
+}
+```
+
+### Context-Aware Use Cases
+
+<Tabs>
+  <Tab title="Rewrite">
+    **Rewrite selected text** with style instructions:
+    
+    1. Select a paragraph in your document
+    2. Say: "Rewrite this to be more professional"
+    3. AI rewrites the selection with the requested tone
+    4. Replacement text is returned
+    
+    <Note>
+    Enable `contextAwareness` in settings to use this feature.
+    </Note>
+  </Tab>
+  
+  <Tab title="Summarize">
+    **Summarize long content**:
+    
+    1. Select multiple paragraphs or a full article
+    2. Say: "Summarize this in three bullet points"
+    3. AI extracts key points from the selection
+    4. Summary is returned as text or audio
+  </Tab>
+  
+  <Tab title="Translate">
+    **Translate selected text**:
+    
+    1. Select text in any language
+    2. Say: "Translate this to Spanish"
+    3. AI translates the selection
+    4. Translation replaces or supplements original
+  </Tab>
+  
+  <Tab title="Explain">
+    **Get explanations**:
+    
+    1. Select technical jargon or complex text
+    2. Say: "Explain this in simple terms"
+    3. AI provides a plain-English explanation
+    4. Answer is read aloud via TTS
+  </Tab>
+</Tabs>
+
+## Selection Rewriting
+
+Selection rewriting is a powerful context-aware feature for text transformation:
+
+### Selection Rewrite Workflow
+
+```mermaid
+graph LR
+    A[Select Text] --> B[Activate Assistant]
+    B --> C[Speak Command]
+    C --> D[STT Transcription]
+    D --> E[AI Processing]
+    E --> F[Generate Rewrite]
+    F --> G[Return Result]
+    G --> H[Optional: Auto-Replace]
+```
+
+### Rewrite Commands
+
+| Command | Effect |
+|---------|--------|
+| "Make this more concise" | Reduces word count while preserving meaning |
+| "Make this professional" | Adjusts tone for business communication |
+| "Fix grammar" | Corrects grammatical errors |
+| "Make this casual" | Relaxes formal language |
+| "Expand on this" | Adds detail and elaboration |
+
+<Info>
+Rewrite results respect your configured `styleProfile` setting: adaptive, professional, casual, concise, or developer.
+</Info>
+
+## Response Playback
+
+Assistant responses are played back using text-to-speech (TTS) for a natural conversational experience:
+
+### TTS Pipeline
+
+```typescript
+interface PersistedSettings {
+  ttsEngine: TtsEngine;              // "piper" or "coqui"
+  piperSpeed: number;                // Playback speed (default: 1.08)
+  piperQuality: PiperQuality;        // "fast" | "balanced" | "high"
+  piperEmotion: PiperEmotion;        // "neutral" | "calm" | "happy" etc.
+}
+
+type TtsEngine = "piper" | "coqui";
+const DEFAULT_TTS_ENGINE: TtsEngine = "piper";
+```
+
+### TTS Features
+
+1. **Automatic Playback** - Responses are spoken aloud immediately
+2. **High-Quality Voices** - Piper (default) or Coqui TTS engines
+3. **Speed Control** - Adjust playback speed (0.5x to 2.0x)
+4. **Quality Modes** - Choose between fast, balanced, or high quality
+5. **Emotion Control** - Select voice tone: neutral, calm, happy, excited, etc.
+
+<Tabs>
+  <Tab title="Piper TTS">
+    **Piper** is the default TTS engine (zero-Python mode).
+    
+    - Fast, lightweight, and reliable
+    - No Python dependencies required
+    - Multiple quality and emotion settings
+    - Default speed: 1.08x
+    
+    ```typescript
+    const DEFAULT_PIPER_SPEED = 1.08;
+    const DEFAULT_PIPER_QUALITY: PiperQuality = "fast";
+    const DEFAULT_PIPER_EMOTION: PiperEmotion = "neutral";
+    ```
+  </Tab>
+  
+  <Tab title="Coqui TTS">
+    **Coqui** offers advanced voice cloning (disabled in zero-Python mode).
+    
+    - Supports voice cloning from audio samples
+    - Multilingual support with XTTS v2
+    - Requires Python environment
+    - GPU acceleration available
+    
+    ```typescript
+    const DEFAULT_COQUI_MODEL = "tts_models/multilingual/multi-dataset/xtts_v2";
+    const DEFAULT_COQUI_LANGUAGE = "en";
+    const ZERO_PYTHON_MODE = true;  // Coqui disabled by default
+    ```
+    
+    <Note>
+    Coqui TTS is disabled in zero-Python mode. Use Piper for out-of-the-box functionality.
+    </Note>
+  </Tab>
+</Tabs>
+
+### Response Latency
+
+Assistant mode tracks latency for each pipeline stage:
+
+```typescript
+interface AssistantPipelineResponse {
+  sttLatencyMs: number;      // Speech-to-text processing time
+  aiLatencyMs: number;       // AI model inference time
+  ttsLatencyMs: number;      // Text-to-speech generation time
+  totalLatencyMs: number;    // End-to-end response time
+}
+```
+
+View real-time pipeline metrics in **Settings > Pipeline**.
+
+## Command Hotkey
+
+Quickly activate assistant mode without wake words:
+
+```typescript
+const DEFAULT_COMMAND_HOTKEY = "Ctrl+Shift+Space";
+```
+
+- Press `Ctrl+Shift+Space` to force assistant mode
+- Bypasses wake word detection
+- Useful for quick queries without saying "Hey [Name]"
+
+<Tip>
+Use the command hotkey for faster assistant access when you don't want to use wake words.
+</Tip>
+
+## Style Profiles
+
+Customize how the assistant responds with style profiles:
+
+```typescript
+type StyleProfile = "adaptive" | "professional" | "casual" | "concise" | "developer";
+const DEFAULT_STYLE_PROFILE: StyleProfile = "adaptive";
+```
+
+| Profile | Response Style |
+|---------|---------------|
+| **Adaptive** | Matches your input tone and context |
+| **Professional** | Formal, business-appropriate language |
+| **Casual** | Friendly, conversational tone |
+| **Concise** | Brief, to-the-point responses |
+| **Developer** | Technical, code-focused answers |
+
+Configure in **Settings > General** under `styleProfile`.
+
+## Best Practices
+
+1. **Use Wake Words Naturally** - Speak your assistant's name clearly at the start
+2. **Enable Context Awareness** - For selection rewriting and context-aware responses
+3. **Choose the Right Style** - Match your style profile to your workflow
+4. **Monitor Latency** - Check pipeline timings to optimize online/offline settings
+5. **Customize TTS** - Adjust speed and emotion for comfortable listening
+
+## Related Features
+
+- [Voice Dictation](/features/voice-dictation) - Simple speech-to-text transcription
+- [Runtime Modes](/features/runtime-modes) - Configure online/offline AI processing
+- [Clipboard Workflow](/features/clipboard-workflow) - How responses are delivered

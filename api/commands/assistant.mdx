@@ -1,0 +1,302 @@
+---
+title: 'Assistant Pipeline Commands'
+description: 'Commands for running the voice assistant pipeline (STT → AI → TTS)'
+---
+
+## assistant_pipeline
+
+Runs the complete assistant pipeline: transcribes audio, generates AI response, and synthesizes speech.
+
+```typescript
+await invoke('run_assistant_pipeline', {
+  apiKey: string,
+  audioBase64: string,
+  audioMimeType: string,
+  // ... additional options
+});
+```
+
+### Request Parameters
+
+<ParamField path="apiKey" type="string" required>
+  OpenAI-compatible API key for online STT/AI services
+</ParamField>
+
+<ParamField path="audioBase64" type="string" required>
+  Base64-encoded audio data (recorded user speech)
+</ParamField>
+
+<ParamField path="audioMimeType" type="string" required>
+  MIME type of the audio (e.g., `audio/wav`, `audio/webm`)
+</ParamField>
+
+<ParamField path="apiBaseUrl" type="string">
+  API base URL (defaults to OpenAI)
+</ParamField>
+
+<ParamField path="sttModel" type="string">
+  Speech-to-text model (e.g., `whisper-1`)
+</ParamField>
+
+<ParamField path="aiModel" type="string">
+  AI chat model (e.g., `gpt-4o-mini`)
+</ParamField>
+
+<ParamField path="localMode" type="boolean">
+  Use local mode for both STT and AI
+</ParamField>
+
+<ParamField path="sttLocalMode" type="boolean">
+  Use local STT only
+</ParamField>
+
+<ParamField path="aiLocalMode" type="boolean">
+  Use local AI only (Ollama)
+</ParamField>
+
+<ParamField path="localOllamaBaseUrl" type="string">
+  Ollama base URL (defaults to `http://localhost:11434`)
+</ParamField>
+
+<ParamField path="localOllamaModel" type="string">
+  Ollama model name (e.g., `llama3.2:3b`)
+</ParamField>
+
+<ParamField path="localSttModel" type="string">
+  Local STT model (e.g., `nvidia/parakeet-tdt_ctc-110m`)
+</ParamField>
+
+<ParamField path="piperPath" type="string">
+  Custom path to Piper TTS executable
+</ParamField>
+
+<ParamField path="language" type="string">
+  Target language for transcription (e.g., `en`, `es`, `fr`)
+</ParamField>
+
+<ParamField path="allowedLanguages" type="string[]">
+  List of allowed languages for multi-language detection
+</ParamField>
+
+<ParamField path="systemPrompt" type="string">
+  Custom system prompt for AI assistant
+</ParamField>
+
+<ParamField path="temperature" type="number">
+  AI response temperature (0.0-2.0)
+</ParamField>
+
+<ParamField path="maxTokens" type="number">
+  Maximum tokens for AI response
+</ParamField>
+
+<ParamField path="dictionaryEntries" type="DictionaryEntry[]">
+  Custom dictionary replacements
+  ```typescript
+  {
+    source: string,  // Text to replace
+    target: string   // Replacement text
+  }
+  ```
+</ParamField>
+
+<ParamField path="snippetEntries" type="SnippetEntry[]">
+  Text expansion snippets
+  ```typescript
+  {
+    trigger: string,   // Trigger phrase
+    expansion: string  // Expanded text
+  }
+  ```
+</ParamField>
+
+<ParamField path="applyBacktrack" type="boolean">
+  Enable backtracking correction for transcription
+</ParamField>
+
+<ParamField path="removeFillers" type="boolean">
+  Remove filler words (um, uh, etc.)
+</ParamField>
+
+<ParamField path="autoPunctuation" type="boolean">
+  Enable automatic punctuation
+</ParamField>
+
+<ParamField path="autoNumberedLists" type="boolean">
+  Enable automatic numbered list detection
+</ParamField>
+
+<ParamField path="commandMode" type="boolean">
+  Enable command mode (assistant conversation)
+</ParamField>
+
+<ParamField path="wakeWordEnabled" type="boolean">
+  Enable wake word detection (e.g., "Hey Slasshy")
+</ParamField>
+
+<ParamField path="assistantName" type="string">
+  Custom assistant name for wake word
+</ParamField>
+
+<ParamField path="selectedText" type="string">
+  Currently selected text for context-aware processing
+</ParamField>
+
+<ParamField path="ttsEngine" type="string">
+  TTS engine: `piper` or `coqui`
+</ParamField>
+
+<ParamField path="piper" type="PiperPipelineRequest">
+  Piper TTS configuration
+  ```typescript
+  {
+    speed?: number,      // 0.5-2.0
+    quality?: string,    // fast | balanced | high
+    emotion?: string     // neutral | calm | happy | excited | serious | sad
+  }
+  ```
+</ParamField>
+
+<ParamField path="coqui" type="CoquiPipelineRequest">
+  Coqui TTS configuration
+  ```typescript
+  {
+    pythonPath?: string,
+    modelName?: string,
+    language?: string,
+    speakerId?: string,
+    speed?: number,
+    quality?: string,
+    emotion?: string,
+    useGpu?: boolean,
+    splitSentences?: boolean
+  }
+  ```
+</ParamField>
+
+### Response
+
+<ResponseField name="mode" type="string">
+  Pipeline mode: `assistant` or `dictation`
+</ResponseField>
+
+<ResponseField name="selectionRewrite" type="boolean">
+  Whether selection text was rewritten
+</ResponseField>
+
+<ResponseField name="selectionPending" type="boolean">
+  Whether a selection rewrite is pending confirmation
+</ResponseField>
+
+<ResponseField name="selectionContextCleared" type="boolean">
+  Whether selection context was cleared
+</ResponseField>
+
+<ResponseField name="selectionContextUsed" type="boolean">
+  Whether selection context was used in processing
+</ResponseField>
+
+<ResponseField name="transcript" type="string">
+  Transcribed text from audio
+</ResponseField>
+
+<ResponseField name="assistantResponse" type="string">
+  AI-generated response text
+</ResponseField>
+
+<ResponseField name="audioBase64" type="string">
+  Base64-encoded TTS audio of the response
+</ResponseField>
+
+<ResponseField name="sttLatencyMs" type="number">
+  Speech-to-text processing time (milliseconds)
+</ResponseField>
+
+<ResponseField name="aiLatencyMs" type="number">
+  AI response generation time (milliseconds)
+</ResponseField>
+
+<ResponseField name="ttsLatencyMs" type="number">
+  Text-to-speech synthesis time (milliseconds)
+</ResponseField>
+
+<ResponseField name="totalLatencyMs" type="number">
+  Total pipeline processing time (milliseconds)
+</ResponseField>
+
+## Pipeline Flow
+
+The assistant pipeline executes in three stages:
+
+<Steps>
+  <Step title="Speech-to-Text (STT)">
+    Audio is transcribed using either:
+    - Online: OpenAI-compatible API (e.g., Whisper)
+    - Local: Parakeet, Moonshine, or other local models
+  </Step>
+  
+  <Step title="AI Processing">
+    Transcript is processed by:
+    - Online: OpenAI-compatible chat API (e.g., GPT-4)
+    - Local: Ollama models (e.g., llama3.2:3b)
+    
+    Applies:
+    - System prompt customization
+    - Dictionary replacements
+    - Snippet expansions
+    - Context awareness (selected text)
+  </Step>
+  
+  <Step title="Text-to-Speech (TTS)">
+    Response is synthesized using:
+    - Piper: Fast, lightweight neural TTS
+    - Coqui: Advanced multi-voice TTS
+  </Step>
+</Steps>
+
+## Hybrid Mode
+
+You can mix online and local services:
+
+```typescript
+// Local STT + Online AI
+{
+  sttLocalMode: true,
+  aiLocalMode: false,
+  localSttModel: 'nvidia/parakeet-tdt_ctc-110m',
+  apiKey: 'sk-...',
+  aiModel: 'gpt-4o-mini'
+}
+
+// Online STT + Local AI
+{
+  sttLocalMode: false,
+  aiLocalMode: true,
+  apiKey: 'sk-...',
+  localOllamaModel: 'llama3.2:3b'
+}
+```
+
+## Example
+
+```typescript
+const response = await invoke<AssistantPipelineResponse>('run_assistant_pipeline', {
+  apiKey: 'sk-...',
+  audioBase64: audioData,
+  audioMimeType: 'audio/wav',
+  commandMode: true,
+  wakeWordEnabled: true,
+  assistantName: 'Slasshy',
+  aiModel: 'gpt-4o-mini',
+  ttsEngine: 'piper',
+  piper: {
+    speed: 1.0,
+    quality: 'balanced',
+    emotion: 'neutral'
+  }
+});
+
+console.log('Transcript:', response.transcript);
+console.log('Response:', response.assistantResponse);
+console.log('Total time:', response.totalLatencyMs + 'ms');
+```

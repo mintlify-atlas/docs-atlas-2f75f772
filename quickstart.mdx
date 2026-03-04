@@ -1,80 +1,251 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Get started with SlasshyWispr and complete your first voice dictation in under 5 minutes."
 ---
 
-## Get started in three steps
+SlasshyWispr is a desktop voice dictation and AI assistant app. This guide will help you set up the application and perform your first voice dictation.
 
-Get your documentation site running locally and make your first customization.
+<Warning>
+SlasshyWispr is in **strong beta**. Expect bugs, rough edges, and breaking changes while features are actively evolving.
+</Warning>
 
-### Step 1: Set up your local environment
+## Prerequisites
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
+Before you begin, ensure you have:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Windows OS" icon="windows">
+    SlasshyWispr currently supports Windows operating systems
+  </Card>
+  <Card title="Microphone" icon="microphone">
+    A working microphone for voice input
+  </Card>
+  <Card title="Internet Connection" icon="wifi">
+    Required for online models and downloads
+  </Card>
+  <Card title="API Keys (Optional)" icon="key">
+    For online STT/AI models (OpenAI, etc.)
+  </Card>
 </CardGroup>
 
+## Installation
+
+<Steps>
+  <Step title="Download the Installer">
+    Get the latest Windows installer from the GitHub releases page:
+    
+    [https://github.com/SlasshyOverhere/SlasshyWispr/releases/latest](https://github.com/SlasshyOverhere/SlasshyWispr/releases/latest)
+  </Step>
+
+  <Step title="Run the Installer">
+    Execute the downloaded installer and follow the on-screen instructions to complete the installation.
+  </Step>
+
+  <Step title="Launch SlasshyWispr">
+    After installation, launch the application from your Start menu or desktop shortcut.
+  </Step>
+</Steps>
+
+## Initial Setup
+
+### Configure Models
+
+<Steps>
+  <Step title="Open Model Settings">
+    Navigate to **Settings > Models** in the application.
+  </Step>
+
+  <Step title="Choose STT Runtime Mode">
+    Select your Speech-to-Text (STT) runtime mode:
+    
+    - **Online**: Use cloud-based STT services (requires API key)
+    - **Offline**: Use local STT models (no internet required)
+  </Step>
+
+  <Step title="Choose AI Runtime Mode">
+    Select your AI assistant runtime mode:
+    
+    - **Online**: Use cloud-based AI models (requires API key)
+    - **Offline**: Use local Ollama models
+  </Step>
+</Steps>
+
+### Configure Online Models (If Using Online Mode)
+
+If you selected online mode for either STT or AI:
+
+<Steps>
+  <Step title="Add API Configuration">
+    In the model settings:
+    
+    - Enter your **API Base URL**
+    - Enter your **API Key**
+    - Specify the **STT Model Name** (if using online STT)
+    - Specify the **AI Model Name** (if using online AI)
+  </Step>
+
+  <Step title="Save API Credentials">
+    Enable "Remember API Key" to avoid re-entering credentials on each launch.
+  </Step>
+</Steps>
+
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+Your API credentials are stored locally and never shared with third parties.
 </Note>
+
+### Configure Local Models (If Using Offline Mode)
+
+#### Local STT Setup
+
+If you selected offline STT mode:
+
+<Steps>
+  <Step title="Download a Local STT Model">
+    In **Settings > Models**, download one of the available local STT models:
+    
+    - **Parakeet v3** (478 MB) - Recommended for most users
+    - **Whisper Turbo** (1.6 GB) - High accuracy
+    - **Moonshine Base** (58 MB) - Lightweight option
+  </Step>
+
+  <Step title="Select the Model">
+    Once downloaded, select the model from the dropdown to activate it.
+  </Step>
+</Steps>
+
+<Tip>
+The Parakeet v3 model offers the best balance of speed and accuracy for most use cases.
+</Tip>
+
+#### Local AI Setup
+
+If you selected offline AI mode:
+
+<Steps>
+  <Step title="Configure Ollama">
+    Ensure Ollama is installed and running on your system.
+    
+    Default Ollama URL: `http://127.0.0.1:11434`
+  </Step>
+
+  <Step title="Pull an Ollama Model">
+    In the settings, select or pull a local Ollama model (e.g., `llama2`, `mistral`, `phi3`).
+  </Step>
+</Steps>
+
+<Info>
+Learn more about Ollama models at [https://ollama.com/library](https://ollama.com/library)
+</Info>
+
+### Configure Microphone and Hotkeys
+
+<Steps>
+  <Step title="Open General Settings">
+    Navigate to **Settings > General**.
+  </Step>
+
+  <Step title="Select Microphone">
+    Choose your preferred microphone device from the dropdown list.
+  </Step>
+
+  <Step title="Configure Hotkeys">
+    Review and customize your hotkeys:
+    
+    - **Push-to-Talk Hotkey**: `Ctrl+Space` (default) - Hold to record dictation
+    - **Command Hotkey**: `Ctrl+Shift+Space` (default) - Trigger assistant mode
+  </Step>
+
+  <Step title="Choose Capture Mode">
+    Select your preferred capture mode:
+    
+    - **Push-to-Talk** (default): Hold the hotkey while speaking
+    - **Single-Tap**: Press once to start, press again to stop
+  </Step>
+</Steps>
+
+## Your First Dictation
+
+Now you're ready to test voice dictation!
+
+<Steps>
+  <Step title="Position Your Cursor">
+    Click into any text field (e.g., Notepad, Word, browser text box).
+  </Step>
+
+  <Step title="Hold the Hotkey">
+    Press and hold `Ctrl+Space` (or your configured hotkey).
+  </Step>
+
+  <Step title="Speak Clearly">
+    While holding the hotkey, speak naturally: "Hello, this is my first dictation test."
+  </Step>
+
+  <Step title="Release to Process">
+    Release the hotkey when you're done speaking. SlasshyWispr will process your voice and transcribe it.
+  </Step>
+
+  <Step title="View Results">
+    Your transcribed text will be automatically pasted into the text field (if auto-paste is enabled) or copied to your clipboard.
+  </Step>
+</Steps>
+
+<Tip>
+Watch the app window for real-time pipeline status showing STT, AI, and TTS processing times.
+</Tip>
+
+## Test Assistant Mode
+
+SlasshyWispr includes an AI assistant mode for interactive conversations:
+
+<Steps>
+  <Step title="Enable Wake Word (Optional)">
+    In **Settings > General**, enable "Wake Word" and set your assistant name (default: "Lily").
+    
+    When enabled, say "Hey [Assistant Name]" to activate the assistant.
+  </Step>
+
+  <Step title="Trigger Assistant Mode">
+    Use the command hotkey (`Ctrl+Shift+Space` by default) or say your wake phrase.
+  </Step>
+
+  <Step title="Ask a Question">
+    Speak your question or command: "What's the weather like today?"
+  </Step>
+
+  <Step title="Listen to Response">
+    The assistant will generate a response and speak it back to you using text-to-speech (TTS).
+  </Step>
+</Steps>
+
+<Note>
+Assistant mode requires an AI model (online or offline) to be configured.
+</Note>
+
+## Next Steps
+
+Congratulations! You've completed your first voice dictation. Here are some advanced features to explore:
+
+<CardGroup cols={2}>
+  <Card title="Dictionary & Snippets" icon="book" href="/tools/dictionary">
+    Create custom vocabulary and text shortcuts
+  </Card>
+  <Card title="Style Profiles" icon="palette" href="/configuration/advanced-settings">
+    Customize AI response tone and formatting
+  </Card>
+  <Card title="Context Awareness" icon="brain" href="/guides/context-awareness">
+    Enable selection-based rewriting and context
+  </Card>
+  <Card title="TTS Configuration" icon="volume-high" href="/configuration/tts-setup">
+    Fine-tune text-to-speech voice and quality
+  </Card>
+</CardGroup>
+
+### Additional Resources
+
+- **Updates**: Check for updates in **Settings > Update and Security**
+- **Support**: Report issues at [https://github.com/SlasshyOverhere/SlasshyWispr/issues](https://github.com/SlasshyOverhere/SlasshyWispr/issues)
+- **Demo Video**: Watch the [demonstration video](https://github.com/SlasshyOverhere/SlasshyWispr/raw/main/slasshywispr_demo.mp4) to see all features in action
+
+<Info>
+Need help? Open an issue on GitHub or check the documentation for detailed configuration guides.
+</Info>

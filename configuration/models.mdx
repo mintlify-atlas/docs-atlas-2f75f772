@@ -1,0 +1,174 @@
+---
+title: Model Configuration
+description: Configure STT, AI, and model provider settings for online and offline modes
+---
+
+SlasshyWispr supports flexible model configuration for speech-to-text (STT) and AI inference. You can run entirely online, entirely offline, or in hybrid mode with independent runtime selection for each component.
+
+## Runtime Mode Selection
+
+<ParamField path="sttRuntimeMode" type="RuntimeMode" default="online">
+  Speech-to-text runtime mode
+  
+  Choose between:
+  - `online` - Use cloud-based STT service via API
+  - `local` - Use local STT models (Parakeet)
+</ParamField>
+
+<ParamField path="aiRuntimeMode" type="RuntimeMode" default="online">
+  AI inference runtime mode
+  
+  Choose between:
+  - `online` - Use cloud-based AI service via API
+  - `local` - Use local AI models via Ollama
+</ParamField>
+
+<ParamField path="runtimeMode" type="RuntimeMode" default="online">
+  Legacy runtime mode (applies to both STT and AI)
+  
+  This is maintained for backward compatibility. Use `sttRuntimeMode` and `aiRuntimeMode` for independent control.
+</ParamField>
+
+## Online Model Settings
+
+Configure cloud-based model providers for online mode.
+
+<ParamField path="apiBaseUrl" type="string" default="">
+  API base URL for online model provider
+  
+  Examples:
+  - OpenAI: `https://api.openai.com/v1`
+  - Custom provider endpoint
+  
+  Leave empty to use default provider.
+</ParamField>
+
+<ParamField path="apiKey" type="string" default="" required>
+  API authentication key for online services
+  
+  <Note>
+    Keep your API key secure. Enable `rememberApiKey` to persist it across sessions.
+  </Note>
+</ParamField>
+
+<ParamField path="rememberApiKey" type="boolean" default="false">
+  Persist API key in settings storage
+  
+  When enabled, your API key is saved locally and restored on app restart.
+</ParamField>
+
+<ParamField path="sttModelName" type="string" default="">
+  Model name for online speech-to-text
+  
+  Examples:
+  - `whisper-1`
+  - Provider-specific model identifier
+</ParamField>
+
+<ParamField path="aiModelName" type="string" default="">
+  Model name for online AI inference
+  
+  Examples:
+  - `gpt-4`
+  - `gpt-3.5-turbo`
+  - `claude-3-opus-20240229`
+</ParamField>
+
+## Local Model Settings
+
+Configure offline models for local inference.
+
+### Local STT Models
+
+<ParamField path="localSttModel" type="string" default="">
+  Local speech-to-text model selection
+  
+  Available models:
+  
+  <Accordion title="Parakeet Models (Recommended)">
+    - **Parakeet v3** (`nvidia/parakeet-tdt-0.6b-v3`) - 478 MB - Latest version
+    - **Parakeet v2** (`nvidia/parakeet-tdt_ctc-110m`) - 473 MB - Stable version
+    - **Parakeet v2 Legacy** (`nvidia/parakeet-tdt-0.6b-v2`) - 473 MB
+  </Accordion>
+  
+  <Accordion title="Whisper Models">
+    - **Whisper Turbo** (`openai/whisper-large-v3-turbo`) - 1.6 GB - Fastest large model
+    - **Whisper Large v3** (`openai/whisper-large-v3`) - 1.1 GB - Most accurate
+    - **Whisper Medium** (`openai/whisper-medium`) - 492 MB - Balanced
+    - **Whisper Small** (`openai/whisper-small`) - 487 MB - Lightweight
+  </Accordion>
+  
+  <Accordion title="Other Models">
+    - **SenseVoice** (`FunAudioLLM/SenseVoiceSmall`) - 160 MB - Compact option
+    - **Moonshine Base** (`UsefulSensors/moonshine-base`) - 58 MB - Ultra-lightweight
+  </Accordion>
+  
+  <Note>
+    Models must be downloaded before use. SlasshyWispr will guide you through the download process in Settings > Models.
+  </Note>
+</ParamField>
+
+### Local AI Models (Ollama)
+
+<ParamField path="localOllamaBaseUrl" type="string" default="http://127.0.0.1:11434">
+  Ollama service base URL
+  
+  Default points to local Ollama instance. Change if running Ollama on a different host or port.
+</ParamField>
+
+<ParamField path="localOllamaModel" type="string" default="">
+  Ollama model name for local AI inference
+  
+  Examples:
+  - `llama2`
+  - `mistral`
+  - `codellama`
+  - `phi3`
+  
+  <Note>
+    Ollama must be installed and running separately. Pull models using `ollama pull <model-name>`.
+  </Note>
+</ParamField>
+
+## Setup Guide
+
+<Tabs>
+  <Tab title="Online Mode">
+    1. Open **Settings > Models**
+    2. Set STT Runtime to `Online`
+    3. Set AI Runtime to `Online`
+    4. Enter your API Base URL
+    5. Enter your API Key
+    6. Enable "Remember API Key" (optional)
+    7. Specify STT and AI model names
+    8. Test with a quick dictation
+  </Tab>
+  
+  <Tab title="Offline Mode">
+    1. Open **Settings > Models**
+    2. Set STT Runtime to `Local`
+    3. Set AI Runtime to `Local`
+    4. Download a local STT model (Parakeet recommended)
+    5. Install and start Ollama
+    6. Pull an Ollama model: `ollama pull llama2`
+    7. Select the pulled model in settings
+    8. Test with offline dictation
+  </Tab>
+  
+  <Tab title="Hybrid Mode">
+    1. Open **Settings > Models**
+    2. Choose independent runtime modes:
+       - Example: STT `Local` + AI `Online`
+       - Example: STT `Online` + AI `Local`
+    3. Configure settings for active modes
+    4. This allows mixing cloud accuracy with local privacy
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+- **Privacy-first**: Use local mode to keep all data on-device
+- **Speed-first**: Use online mode for fastest inference
+- **Balanced**: Use Parakeet v3 locally with online AI for fast STT and powerful responses
+- **Hardware advisor**: SlasshyWispr analyzes your CPU/GPU and suggests optimal local models
+- **Incognito mode**: Enable in Advanced Settings to prevent history logging regardless of runtime mode
