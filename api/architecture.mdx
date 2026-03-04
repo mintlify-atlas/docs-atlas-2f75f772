@@ -5,8 +5,20 @@ description: 'Deep dive into SlasshyWispr application structure, component desig
 
 ## Application Structure
 
-SlasshyWispr follows a **hybrid architecture** pattern with clear separation between UI layer (TypeScript) and system layer (Rust):
-
+```text
+SlasshyWispr Application
+├── Frontend (TypeScript/Vite)
+│   ├── UI Components
+│   ├── State Management
+│   └── Tauri API Bindings
+└── Backend (Rust)
+    ├── Tauri Commands
+    ├── AppState Management
+    ├── Pipeline Processors
+    │   ├── STT Engine
+    │   ├── AI Integration
+    │   └── TTS Engine
+    └── Local Model Daemons
 ```
 SlasshyWispr Application
 ├── Frontend (TypeScript/Vite)

@@ -61,7 +61,7 @@ const info = await invoke<AssistantInfoResponse>('get_assistant_info');
 
 ## Runtime Setup
 
-### setup_runtime
+### setup_assistant_runtime
 
 Sets up the TTS runtime environment (Piper + voice model).
 
@@ -89,7 +89,7 @@ const setup = await invoke<RuntimeSetupResponse>('setup_assistant_runtime', {
   Installed voice config path
 </ResponseField>
 
-### validate_piper_setup
+### validate_piper
 
 Validates that Piper TTS is correctly configured.
 
@@ -113,7 +113,7 @@ const validation = await invoke<PiperValidationResponse>('validate_piper', {
   Validation result details
 </ResponseField>
 
-### validate_coqui_setup
+### validate_coqui
 
 Validates that Coqui TTS is correctly configured.
 
@@ -302,11 +302,11 @@ Some commands have platform-specific implementations:
 | Command | Windows | macOS | Linux |
 |---------|---------|-------|-------|
 | `get_assistant_info` | ✅ | ✅ | ✅ |
-| `setup_runtime` | ✅ | ✅ | ✅ |
-| `validate_piper_setup` | ✅ | ✅ | ✅ |
-| `validate_coqui_setup` | ✅ | ✅ | ✅ |
+| `setup_assistant_runtime` | ✅ | ✅ | ✅ |
+| `validate_piper` | ✅ | ✅ | ✅ |
+| `validate_coqui` | ✅ | ✅ | ✅ |
 | `check_for_app_update` | ✅ | ✅ | ✅ |
-| `install_app_update` | ✅ | ❌ | ❌ |
+| `download_and_install_app_update` | ✅ | ❌ | ❌ |
 | `configure_launch_at_login` | ✅ | ❌ | ❌ |
 
 <Info>

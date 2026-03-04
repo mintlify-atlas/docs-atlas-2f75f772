@@ -41,7 +41,7 @@ await invoke('download_local_stt_model', {
   Human-readable status message
 </ResponseField>
 
-### warmup_local_stt_daemon
+### warmup_local_stt_model
 
 Preloads a local STT model into memory for faster inference.
 
@@ -73,7 +73,7 @@ await invoke('warmup_local_stt_model', {
   Status details
 </ResponseField>
 
-### deactivate_local_stt_daemon
+### deactivate_local_stt_model
 
 Unloads a local STT model from memory.
 
@@ -276,7 +276,7 @@ await invoke('get_ollama_status', {
   Additional status information
 </ResponseField>
 
-### get_provider_models
+### fetch_provider_models
 
 Fetches available models from an OpenAI-compatible provider.
 
@@ -307,7 +307,7 @@ await invoke('fetch_provider_models', {
 
 ## TTS Voice Management
 
-### install_piper_voice
+### ensure_voice_model
 
 Downloads and installs a Piper TTS voice model.
 
@@ -327,7 +327,7 @@ await invoke('ensure_voice_model', {
   Path to voice config file
 </ResponseField>
 
-### coqui_clone_voice
+### clone_coqui_voice
 
 Clones a voice from audio sample using Coqui TTS.
 
